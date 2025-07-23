@@ -1,0 +1,60 @@
+# ESP-IDF build system
+build/
+sdkconfig
+sdkconfig.old
+*.pyc
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Flash download tool
+flash_download_tool/
+
+# Components
+components/esp32-camera/
+components/arduino/
+
+# Dependencies
+managed_components/
+
+# Bootloader
+bootloader/
+
+# Generated files
+dependencies.lock
+
+# Python virtual environment
+venv/
+env/
+
+# Test results
+test_results/
+*.xml
+
+# Documentation build
+docs/_build/
+docs/build/
+
+# Local configuration
+local_config.h
+local_secrets.h

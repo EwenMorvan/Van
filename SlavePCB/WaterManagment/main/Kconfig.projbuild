@@ -1,0 +1,63 @@
+menu "SlavePCB Configuration"
+
+    config SLAVEPCB_ENABLE_DEBUG_LOGS
+        bool "Enable debug logging"
+        default y
+        help
+            Enable debug level logging for SlavePCB components.
+
+    config SLAVEPCB_BUTTON_DEBOUNCE_MS
+        int "Button debounce time (ms)"
+        range 10 1000
+        default 50
+        help
+            Time in milliseconds for button debouncing.
+
+    config SLAVEPCB_LONG_CLICK_MS
+        int "Long click threshold (ms)"
+        range 500 5000
+        default 1000
+        help
+            Time in milliseconds to distinguish between short and long clicks.
+
+    config SLAVEPCB_HX711_SAMPLES
+        int "HX711 samples for averaging"
+        range 1 50
+        default 10
+        help
+            Number of samples to take for weight averaging.
+
+    config SLAVEPCB_TANK_READ_INTERVAL_MS
+        int "Tank reading interval (ms)"
+        range 500 10000
+        default 2000
+        help
+            Interval between tank weight readings.
+
+    config SLAVEPCB_I2C_FREQ_HZ
+        int "I2C frequency (Hz)"
+        range 10000 400000
+        default 100000
+        help
+            I2C bus frequency for current sensors.
+
+    config SLAVEPCB_W5500_IP
+        string "W5500 IP Address"
+        default "192.168.1.100"
+        help
+            IP address for the W5500 Ethernet controller.
+
+    config SLAVEPCB_MAINPCB_IP
+        string "MainPCB IP Address"
+        default "192.168.1.50"
+        help
+            IP address of the MainPCB to communicate with.
+
+    config SLAVEPCB_COMM_PORT
+        int "Communication port"
+        range 1024 65535
+        default 8080
+        help
+            TCP port for communication with MainPCB.
+
+endmenu
