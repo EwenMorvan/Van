@@ -268,3 +268,10 @@ The Communication Manager acts as the central hub for all inter-task communicati
 
 The manager listens for incoming instructions from the MainPCB and relays them to the appropriate task. It also collects data from the other managers (e.g., button states, load cell readings, pump/electrovalve statuses) and sends this information to the MainPCB. This ensures seamless coordination between all components and reliable communication with the main system.
 
+## Water Tanck
+
+A = 1 = recycled water 1
+B = 2 = dirty water 1
+C = 3 = recycled water 2
+D = 4 = dirty water 2
+E = Clean water

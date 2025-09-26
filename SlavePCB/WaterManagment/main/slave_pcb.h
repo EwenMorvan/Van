@@ -20,6 +20,8 @@
 #include "driver/i2c.h"
 #include "driver/spi_master.h"
 
+#include "sdkconfig.h"
+
 #include "gpio_pinout.h"
 
 // Error codes
@@ -60,6 +62,7 @@ typedef enum {
     DEVICE_ELECTROVALVE_C,
     DEVICE_ELECTROVALVE_D,
     DEVICE_ELECTROVALVE_E,
+    DEVICE_ELECTROVALVE_F,
     DEVICE_PUMP_PE,
     DEVICE_PUMP_PD,
     DEVICE_PUMP_PV,
@@ -169,10 +172,18 @@ void electrovalve_pump_manager_task(void *pvParameters);
 void button_manager_task(void *pvParameters);
 void load_cell_manager_task(void *pvParameters);
 void communication_manager_task(void *pvParameters);
+void button_manager_notify_transition_complete(void);
 
 // Additional function declarations
 slave_pcb_err_t apply_electrovalve_pump_case(system_case_t case_id);
 uint32_t get_current_system_states(void);
+
+// Load cell calibration functions
+slave_pcb_err_t calibrate_tank_with_known_weight(tank_id_t tank_id, float known_weight_kg);
+
+// Current reading functions  
+float get_pump_current_reading(uint8_t pump_id);
+float get_electrovalve_current_reading(uint8_t electrovalve_id);
 
 // Error management functions
 void log_system_error(slave_pcb_err_t error_code, const char* component, const char* description);

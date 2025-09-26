@@ -1,9 +1,10 @@
-idf_component_register(SRCS "main.c"
+idf_component_register(SRCS  "wifi_ota_manager.c" "main.c"
                             "error_manager.c"
                             "shift_register.c"
                             "communication_manager.c"
                             "electrovalve_pump_manager.c"
                             "button_manager.c"
-                            "load_cell_manager.c"
+                            "load_cell_manager_simple.c"
+                            "ble_comm.c"
                     INCLUDE_DIRS "."
-                    REQUIRES freertos driver esp_timer nvs_flash esp_netif esp_eth)
+                    REQUIRES freertos driver esp_timer nvs_flash esp_netif lwip esp_eth bt esp_wifi esp_event esp_http_server app_update esp_http_client)   

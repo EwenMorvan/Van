@@ -1,6 +1,31 @@
 #include "slave_pcb.h"
+#include "wifi_ota_manager.h"
+#include "ble_comm.h"
 
 static const char *TAG = "SLAVE_PCB_MAIN";
+
+// BLE communication
+ble_comm_t ble_comm;
+bool ble_connected = false;
+
+// BLE configuration - Set this to true for ESP A (server), false for ESP B (client)
+#define IS_ESP_A_SERVER false
+
+// BLE callback functions
+static void on_ble_connected(void) {
+    ble_connected = true;
+    ESP_LOGI(TAG, "BLE connected successfully");
+}
+
+static void on_ble_disconnected(void) {
+    ble_connected = false;
+    ESP_LOGI(TAG, "BLE disconnected");
+}
+
+static void on_ble_data_received(const char* data, size_t len) {
+    ESP_LOGI(TAG, "BLE data received: %.*s", len, data);
+    // TODO: Process received BLE data
+}
 
 // Global queues and mutexes
 QueueHandle_t comm_queue = NULL;
@@ -29,34 +54,6 @@ static const uint32_t incompatible_cases[CASE_MAX] = {
     [CASE_P1] = STATE_RF
 };
 
-// Case logic table (from Overview.md)
-typedef struct {
-    bool electrovalve_a;
-    bool electrovalve_b;
-    bool electrovalve_c;
-    bool electrovalve_d;
-    bool electrovalve_e;
-    bool pump_pe;
-    bool pump_pd;
-    bool pump_pv;
-    bool pump_pp;
-} case_logic_t;
-
-static const case_logic_t case_logic[CASE_MAX] = {
-    [CASE_RST] = {0, 0, 0, 0, 0, 0, 0, 0, 0},
-    [CASE_E1]  = {0, 1, 1, 0, 0, 1, 0, 0, 0},
-    [CASE_E2]  = {0, 1, 0, 0, 0, 1, 0, 0, 0},
-    [CASE_E3]  = {1, 1, 1, 0, 0, 1, 0, 0, 0},
-    [CASE_E4]  = {1, 1, 0, 0, 0, 1, 0, 0, 0},
-    [CASE_D1]  = {0, 0, 1, 1, 0, 1, 1, 0, 0},
-    [CASE_D2]  = {0, 0, 0, 1, 0, 1, 1, 0, 0},
-    [CASE_D3]  = {1, 0, 1, 1, 0, 1, 1, 0, 0},
-    [CASE_D4]  = {1, 0, 0, 1, 0, 1, 1, 0, 0},
-    [CASE_V1]  = {0, 0, 1, 0, 1, 0, 0, 1, 0},
-    [CASE_V2]  = {0, 0, 0, 0, 1, 0, 0, 1, 0},
-    [CASE_P1]  = {0, 0, 0, 0, 1, 0, 0, 0, 1} // Note: A can be 0 or 1 for P1
-};
-
 /**
  * @brief Generic function to set output state for any device
  * @param device Device type to control
@@ -77,7 +74,7 @@ slave_pcb_err_t set_output_state(device_type_t device, bool state) {
 
     slave_pcb_err_t ret = SLAVE_PCB_OK;
 
-    ESP_LOGI(TAG, "Setting device %d to state %d", device, state);
+    // ESP_LOGI(TAG, "Setting device %d to state %d", device, state);
 
     // Use shift register implementation for output control
     ret = shift_register_set_output_state(device, state);
@@ -165,24 +162,8 @@ static slave_pcb_err_t apply_case_logic(system_case_t case_id) {
 
     ESP_LOGI(TAG, "Applying case logic for %s", get_case_string(case_id));
 
-    const case_logic_t *logic = &case_logic[case_id];
-    slave_pcb_err_t ret = SLAVE_PCB_OK;
-
-    // Set electrovalves first
-    ret |= set_output_state(DEVICE_ELECTROVALVE_A, logic->electrovalve_a);
-    ret |= set_output_state(DEVICE_ELECTROVALVE_B, logic->electrovalve_b);
-    ret |= set_output_state(DEVICE_ELECTROVALVE_C, logic->electrovalve_c);
-    ret |= set_output_state(DEVICE_ELECTROVALVE_D, logic->electrovalve_d);
-    ret |= set_output_state(DEVICE_ELECTROVALVE_E, logic->electrovalve_e);
-
-    // Wait for electrovalves to reach position (simulated delay)
-    vTaskDelay(pdMS_TO_TICKS(2000)); // 2 seconds for electrovalves to turn
-
-    // Then set pumps
-    ret |= set_output_state(DEVICE_PUMP_PE, logic->pump_pe);
-    ret |= set_output_state(DEVICE_PUMP_PD, logic->pump_pd);
-    ret |= set_output_state(DEVICE_PUMP_PV, logic->pump_pv);
-    ret |= set_output_state(DEVICE_PUMP_PP, logic->pump_pp);
+    // Delegate to electrovalve_pump_manager for the actual implementation
+    slave_pcb_err_t ret = apply_electrovalve_pump_case(case_id);
 
     if (ret == SLAVE_PCB_OK) {
         current_case = case_id;
@@ -206,8 +187,8 @@ static slave_pcb_err_t init_gpio(void) {
         .pin_bit_mask = (1ULL << BE1) | (1ULL << BE2) | (1ULL << BD1) | 
                        (1ULL << BD2) | (1ULL << BH),
         .mode = GPIO_MODE_INPUT,
-        .pull_up_en = GPIO_PULLUP_ENABLE,
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .pull_up_en = GPIO_PULLUP_DISABLE, 
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,// Already pulled down by PCB
         .intr_type = GPIO_INTR_DISABLE
     };
     
@@ -275,14 +256,14 @@ static slave_pcb_err_t init_gpio(void) {
 }
 
 /**
- * @brief System monitoring task
+ * @brief System monitoring task (simplified)
  */
 static void system_monitor_task(void *pvParameters) {
-    ESP_LOGI(TAG, "System monitor task started");
+    ESP_LOGI(TAG, "System monitor task started (simplified mode)");
 
     while (1) {
-        // Check system health
-        check_system_health();
+        // Simple system health check without current monitoring
+        // check_system_health();
 
         // Print status every 30 seconds
         static uint32_t last_status_print = 0;
@@ -290,26 +271,11 @@ static void system_monitor_task(void *pvParameters) {
         
         if (now - last_status_print > 30) {
             last_status_print = now;
-            print_system_status();
+            ESP_LOGI(TAG, "System running - Current case: %s", get_case_string(current_case));
             print_shift_register_state();
         }
 
-        // Monitor queue usage
-        static uint32_t last_queue_check = 0;
-        if (now - last_queue_check > 5) { // Every 5 seconds
-            last_queue_check = now;
-            
-            UBaseType_t comm_waiting = uxQueueMessagesWaiting(comm_queue);
-            UBaseType_t button_waiting = uxQueueMessagesWaiting(button_queue);
-            UBaseType_t loadcell_waiting = uxQueueMessagesWaiting(loadcell_queue);
-            
-            if (comm_waiting > 15 || button_waiting > 8 || loadcell_waiting > 8) {
-                ESP_LOGW(TAG, "High queue usage - comm:%lu btn:%lu lc:%lu", 
-                         comm_waiting, button_waiting, loadcell_waiting);
-            }
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(1000)); // Check every second
+        vTaskDelay(pdMS_TO_TICKS(5000)); // Check every 5 seconds (less frequent)
     }
 }
 
@@ -371,6 +337,47 @@ static void main_coordinator_task(void *pvParameters) {
     }
 }
 
+
+/**
+ * @brief Calibration helper function - uncomment and modify as needed
+ * This function can be called to calibrate specific tanks
+ */
+void perform_tank_calibration(void) {
+    ESP_LOGI(TAG, "Starting tank calibration process...");
+    ESP_LOGI(TAG, "Make sure to:");
+    ESP_LOGI(TAG, "1. Remove all weight from the tank first");
+    ESP_LOGI(TAG, "2. Wait for the system to stabilize");
+    ESP_LOGI(TAG, "3. Place exactly the specified weight on the tank");
+    
+    // Wait for system to be ready
+    vTaskDelay(pdMS_TO_TICKS(5000));
+    
+    // EXAMPLE CALIBRATIONS - Uncomment and modify as needed:
+    
+    // Calibrate Tank A with 8kg weight
+    ESP_LOGI(TAG, "Calibrating Tank A with 4kg weight...");
+    slave_pcb_err_t ret = calibrate_tank_with_known_weight(TANK_A, 4.0f);
+    if (ret == SLAVE_PCB_OK) {
+        ESP_LOGI(TAG, "Tank A calibration SUCCESS");
+    } else {
+        ESP_LOGE(TAG, "Tank A calibration FAILED: %s", get_error_string(ret));
+    }
+    
+    // Calibrate Tank B with 10kg weight
+    // ESP_LOGI(TAG, "Calibrating Tank B with 10kg weight...");
+    // ret = calibrate_tank_with_known_weight(TANK_B, 10.0f);
+    // if (ret == SLAVE_PCB_OK) {
+    //     ESP_LOGI(TAG, "Tank B calibration SUCCESS");
+    // } else {
+    //     ESP_LOGE(TAG, "Tank B calibration FAILED: %s", get_error_string(ret));
+    // }
+    
+    ESP_LOGI(TAG, "Calibration process completed. Uncomment specific calibrations as needed.");
+}
+
+// Calibration configuration - set to 0 to disable calibration on startup (debugging)
+#define ENABLE_CALIBRATION_ON_STARTUP 0
+
 void app_main(void) {
     ESP_LOGI(TAG, "SlavePCB starting up...");
 
@@ -399,17 +406,23 @@ void app_main(void) {
         return;
     }
 
-    // Initialize all managers
-    ret = communication_manager_init();
-    if (ret != SLAVE_PCB_OK) {
-        ESP_LOGE(TAG, "Failed to initialize Communication Manager: %s", get_error_string(ret));
-        return;
-    }
+    // Initialize only essential managers
+    // ret = communication_manager_init();
+    // if (ret != SLAVE_PCB_OK) {
+    //     ESP_LOGE(TAG, "Failed to initialize Communication Manager: %s", get_error_string(ret));
+    //     return;
+    // }
 
     ret = electrovalve_pump_manager_init();
     if (ret != SLAVE_PCB_OK) {
         ESP_LOGE(TAG, "Failed to initialize Electrovalve Pump Manager: %s", get_error_string(ret));
         return;
+    }
+
+    ret = wifi_ota_init();
+    if (ret != SLAVE_PCB_OK) {
+        ESP_LOGW(TAG, "Failed to initialize WiFi OTA: %s", get_error_string(ret));
+        // Continue without WiFi/OTA - not critical for basic operation
     }
 
     ret = button_manager_init();
@@ -418,24 +431,48 @@ void app_main(void) {
         return;
     }
 
-    ret = load_cell_manager_init();
-    if (ret != SLAVE_PCB_OK) {
-        ESP_LOGE(TAG, "Failed to initialize Load Cell Manager: %s", get_error_string(ret));
-        return;
+    // Initialize BLE communication
+    ret = ble_comm_init(&ble_comm, IS_ESP_A_SERVER);
+    if (ret == ESP_OK) {
+        ble_comm_set_callbacks(on_ble_connected, on_ble_disconnected, on_ble_data_received);
+        ret = ble_comm_start(&ble_comm);
+        if (ret != ESP_OK) {
+            ESP_LOGW(TAG, "Failed to start BLE Communication: %s", esp_err_to_name(ret));
+        } else {
+            ESP_LOGI(TAG, "BLE Communication initialized successfully");
+        }
+    } else {
+        ESP_LOGW(TAG, "Failed to initialize BLE Communication: %s", esp_err_to_name(ret));
+        // Continue without BLE - not critical for basic operation
     }
 
-    // Create manager tasks
-    xTaskCreate(communication_manager_task, "comm_mgr", 4096, NULL, 5, NULL);
+    // DISABLED: Load cell manager for now
+    // ret = load_cell_manager_init();
+    // if (ret != SLAVE_PCB_OK) {
+    //     ESP_LOGE(TAG, "Failed to initialize Load Cell Manager: %s", get_error_string(ret));
+    //     return;
+    // }
+
+    // Create only essential manager tasks
+    // xTaskCreate(communication_manager_task, "comm_mgr", 4096, NULL, 5, NULL);
     xTaskCreate(electrovalve_pump_manager_task, "ev_pump_mgr", 4096, NULL, 4, NULL);
-    xTaskCreate(button_manager_task, "btn_mgr", 3072, NULL, 3, NULL);
-    xTaskCreate(load_cell_manager_task, "loadcell_mgr", 3072, NULL, 3, NULL);
+    xTaskCreate(button_manager_task, "btn_mgr", 4096, NULL, 3, NULL);
+    // xTaskCreate(load_cell_manager_task, "loadcell_mgr", 3072, NULL, 3, NULL);
     
-    // Create main coordinator and system monitor tasks
+    // // Create main coordinator and system monitor tasks
     xTaskCreate(main_coordinator_task, "main_coord", 4096, NULL, 6, NULL);
-    xTaskCreate(system_monitor_task, "sys_monitor", 2048, NULL, 2, NULL);
+    // xTaskCreate(system_monitor_task, "sys_monitor", 4096, NULL, 2, NULL);
 
     // Apply initial RST case
     apply_case_logic(CASE_RST);
 
+    // Optional: Perform calibration on startup if enabled
+#if ENABLE_CALIBRATION_ON_STARTUP
+    ESP_LOGI(TAG, "Calibration enabled - starting calibration process in 5 seconds...");
+    vTaskDelay(pdMS_TO_TICKS(5000));
+    perform_tank_calibration();
+#endif
+
     ESP_LOGI(TAG, "SlavePCB initialization completed successfully");
+
 }

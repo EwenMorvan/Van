@@ -1,6 +1,8 @@
 #include "slave_pcb.h"
+#include "ble_comm.h"
 
 static const char *TAG = "BTN_MGR";
+
 
 // Button state tracking
 typedef struct {
@@ -58,6 +60,35 @@ static const led_colors_t case_led_colors[CASE_MAX] = {
 static volatile system_case_t current_case = CASE_RST;
 static volatile bool leds_transitioning = false;
 
+// External reference to BLE communication structure
+extern ble_comm_t ble_comm;
+extern bool ble_connected;
+
+/**
+ * @brief Send BLE message for hood control
+ */
+static void send_ble_hood_message(bool hood_state) {
+    if (!ble_connected) {
+        ESP_LOGW(TAG, "BLE not connected, cannot send hood message");
+        return;
+    }
+
+    // Create very short message to test MTU limits
+    char ble_message[64];
+    snprintf(ble_message, sizeof(ble_message),
+             "{\"type\":\"command\",\"cmd\":\"set_hood_state\",\"target\":0,\"value\":%d}", hood_state ? 1 : 0);
+
+    size_t msg_len = strlen(ble_message);
+    ESP_LOGI(TAG, "Sending BLE message (len=%d): %s", msg_len, ble_message);
+
+    esp_err_t ret = ble_comm_send(&ble_comm, ble_message, msg_len);
+    if (ret == ESP_OK) {
+        ESP_LOGI(TAG, "BLE hood command sent successfully");
+    } else {
+        ESP_LOGW(TAG, "Failed to send BLE hood command: %s", esp_err_to_name(ret));
+    }
+}
+
 /**
  * @brief Read physical button state
  */
@@ -67,7 +98,7 @@ static bool read_physical_button(button_type_t button) {
         return false; // Virtual button
     }
     
-    // Button is pressed when GPIO reads low (pull-up enabled)
+    // Button is pressed when GPIO reads low (pull-up on pcb)
     return gpio_get_level(gpio_num) == 0;
 }
 
@@ -98,8 +129,8 @@ static click_type_t detect_button_click(button_type_t button) {
             // Button released
             uint32_t press_duration = now - state->press_start_time;
             
-            if (press_duration > 50) { // Debounce: minimum 50ms
-                if (press_duration < 1000) {
+            if (press_duration > CONFIG_SLAVEPCB_BUTTON_DEBOUNCE_MS) { // Debounce: minimum 50ms
+                if (press_duration < CONFIG_SLAVEPCB_LONG_CLICK_MS) {
                     state->last_click = CLICK_SHORT;
                     ESP_LOGI(TAG, "Button %d: Short click detected", button);
                     return CLICK_SHORT;
@@ -139,6 +170,12 @@ static slave_pcb_err_t set_button_leds(system_case_t case_id) {
     ret |= set_output_state(DEVICE_LED_BD1_GREEN, colors->bd1_green);
     ret |= set_output_state(DEVICE_LED_BD2_RED, colors->bd2_red);
     ret |= set_output_state(DEVICE_LED_BD2_GREEN, colors->bd2_green);
+
+    if (ret == SLAVE_PCB_OK) {
+        ESP_LOGI(TAG, "LEDs successfully set for case %s", get_case_string(case_id));
+    } else {
+        ESP_LOGE(TAG, "Failed to set LEDs for case %s", get_case_string(case_id));
+    }
 
     return ret;
 }
@@ -268,13 +305,15 @@ slave_pcb_err_t button_manager_init(void) {
 void button_manager_task(void *pvParameters) {
     ESP_LOGI(TAG, "Button Manager task started");
 
+    static bool hood_state = false; // Track hood state (on/off)
+
     while (1) {
         // Detect button clicks
         click_type_t be1_click = detect_button_click(BUTTON_BE1);
         click_type_t be2_click = detect_button_click(BUTTON_BE2);
         click_type_t bd1_click = detect_button_click(BUTTON_BD1);
         click_type_t bd2_click = detect_button_click(BUTTON_BD2);
-        detect_button_click(BUTTON_BH); // BH button handling can be added later
+        click_type_t bh_click = detect_button_click(BUTTON_BH); // BH button handling
 
         // Get virtual button states
         bool bv1_state = button_states[BUTTON_BV1].virtual_state;
@@ -287,12 +326,30 @@ void button_manager_task(void *pvParameters) {
             be1_click, be2_click, bd1_click, bd2_click,
             bv1_state, bv2_state, bp1_state, brst_state);
 
+        // Check for hood button (BH)
+        if (bh_click == CLICK_SHORT || bh_click == CLICK_LONG) {
+            hood_state = !hood_state; // Swap hood state (on/off)
+
+            // Display "Hood On" or "Hood Off"
+            if (hood_state) {
+                ESP_LOGI(TAG, "Hood Button clicked - Hood On requested");
+            } else {
+                ESP_LOGI(TAG, "Hood Button clicked - Hood Off requested");
+            }
+
+            // Update the state of the LED associated with the BH button
+            set_output_state(DEVICE_LED_BH, hood_state);
+
+            // Send BLE message for hood control
+            send_ble_hood_message(hood_state);
+        }
+
         // If case changed, send message to main coordinator
         if (new_case != current_case) {
             ESP_LOGI(TAG, "Case change requested: %s -> %s", 
                      get_case_string(current_case), get_case_string(new_case));
 
-            // Set LEDs to transitioning state
+            // Set LEDs to transitioning state briefly
             set_leds_transitioning();
 
             comm_msg_t msg = {
@@ -303,9 +360,17 @@ void button_manager_task(void *pvParameters) {
 
             if (xQueueSend(comm_queue, &msg, pdMS_TO_TICKS(100)) != pdTRUE) {
                 ESP_LOGW(TAG, "Failed to send case change message");
+                // If message sending fails, revert LEDs immediately
+                ESP_LOGW(TAG, "Reverting LEDs due to message send failure");
+                leds_transitioning = false;
+                set_button_leds(current_case);
+            } else {
+                ESP_LOGI(TAG, "Case change message sent successfully");
+                
+                // Update case immediately - LEDs will be updated by notify_transition_complete()
+                current_case = new_case;
+                ESP_LOGI(TAG, "Case updated to: %s, waiting for transition complete notification", get_case_string(current_case));
             }
-
-            current_case = new_case;
 
             // Clear virtual button states after processing
             button_states[BUTTON_BV1].virtual_state = false;
@@ -325,23 +390,26 @@ void button_manager_task(void *pvParameters) {
             xQueueSend(button_queue, &btn_msg, 0);
         }
 
-        // Update LEDs if not transitioning
-        if (!leds_transitioning) {
-            set_button_leds(current_case);
-        }
-
-        // Check if transition is complete (simulated - in real system this would come from electrovalve manager)
-        static uint32_t transition_start = 0;
-        if (leds_transitioning) {
-            if (transition_start == 0) {
-                transition_start = esp_timer_get_time() / 1000;
-            } else if (esp_timer_get_time() / 1000 - transition_start > 2000) { // 2 second transition
-                leds_transitioning = false;
-                transition_start = 0;
-                set_button_leds(current_case);
-            }
-        }
-
+        // Simple delay without complex timeout management
         vTaskDelay(pdMS_TO_TICKS(50)); // 20Hz update rate
     }
 }
+
+/**
+ * @brief Notify button manager that case transition is complete
+ * This should be called by electrovalve_pump_manager when case change is finished
+ */
+void button_manager_notify_transition_complete(void) {
+    ESP_LOGI(TAG, "Transition complete notification received");
+    
+    if (leds_transitioning) {
+        ESP_LOGI(TAG, "Clearing transitioning state and setting LEDs for current case: %s", get_case_string(current_case));
+        leds_transitioning = false;
+        set_button_leds(current_case);
+        ESP_LOGI(TAG, "Transition complete - LEDs updated successfully");
+    } else {
+        ESP_LOGI(TAG, "LEDs were not in transitioning state, no update needed");
+    }
+}
+
+

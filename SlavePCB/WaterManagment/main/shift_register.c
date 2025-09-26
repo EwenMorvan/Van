@@ -3,6 +3,10 @@
 #include "esp_rom_sys.h" 
 static const char *TAG = "SHIFT_REG";
 
+// Forward declarations
+static slave_pcb_err_t shift_out_data(void);
+static slave_pcb_err_t set_register_bit(uint8_t register_index, uint8_t bit_position, bool state);
+
 // Shift register chain configuration
 #define SHIFT_REG_BITS_PER_REGISTER 8
 #define SHIFT_REG_NUM_REGISTERS 4  // Total of 32 output bits
@@ -25,23 +29,25 @@ static const device_bit_mapping_t device_mapping[DEVICE_MAX] = {
     [DEVICE_ELECTROVALVE_C] = {0, 2},
     [DEVICE_ELECTROVALVE_D] = {0, 3},
     [DEVICE_ELECTROVALVE_E] = {0, 4},
+    [DEVICE_ELECTROVALVE_F] = {0, 5},
+
     
     // Pumps (Register 0)
-    [DEVICE_PUMP_PE] = {0, 5},
-    [DEVICE_PUMP_PD] = {0, 6},
+    [DEVICE_PUMP_PE] = {0, 6},
     [DEVICE_PUMP_PV] = {0, 7},
-    [DEVICE_PUMP_PP] = {1, 0},
-    
-    // Button LEDs (Registers 1-3)
-    [DEVICE_LED_BE1_RED]   = {1, 1},
-    [DEVICE_LED_BE1_GREEN] = {1, 2},
-    [DEVICE_LED_BE2_RED]   = {1, 3},
-    [DEVICE_LED_BE2_GREEN] = {1, 4},
-    [DEVICE_LED_BD1_RED]   = {1, 5},
-    [DEVICE_LED_BD1_GREEN] = {1, 6},
-    [DEVICE_LED_BD2_RED]   = {1, 7},
-    [DEVICE_LED_BD2_GREEN] = {2, 0},
-    [DEVICE_LED_BH]        = {2, 1},
+    [DEVICE_PUMP_PD] = {1, 0},
+    [DEVICE_PUMP_PP] = {1, 1},
+    [DEVICE_LED_BH]  = {1, 2}, 
+
+    // Button LEDs (Registers 1-3) - Order matches device_type_t enum in slave_pcb.h
+    [DEVICE_LED_BE1_RED]     = {1, 4},  // BE1 RED -> Hardware position {1, 4}
+    [DEVICE_LED_BE1_GREEN]   = {1, 3},  // BE1 GREEN -> Hardware position {1, 3}
+    [DEVICE_LED_BE2_RED]     = {1, 6},  // BE2 RED -> Hardware position {1, 6}
+    [DEVICE_LED_BE2_GREEN]   = {1, 5},  // BE2 GREEN -> Hardware position {1, 5}
+    [DEVICE_LED_BD1_RED]     = {2, 0},  // BD1 RED -> Hardware position {2, 0}
+    [DEVICE_LED_BD1_GREEN]   = {1, 7},  // BD1 GREEN -> Hardware position {1, 7}
+    [DEVICE_LED_BD2_RED]     = {2, 2},  // BD2 RED -> Hardware position {2, 2}
+    [DEVICE_LED_BD2_GREEN]   = {2, 1},  // BD2 GREEN -> Hardware position {2, 1}
 };
 
 /**
@@ -57,16 +63,26 @@ slave_pcb_err_t init_shift_registers(void) {
     gpio_set_level(REG_STCP, 0);  // Storage Clock low
     gpio_set_level(REG_SHCP, 0);  // Shift Clock low
 
+    // Wait for signals to stabilize
+    vTaskDelay(pdMS_TO_TICKS(10));
+
     // Clear all shift register data
     memset(shift_register_data, 0, sizeof(shift_register_data));
 
     // Perform a master reset pulse
     gpio_set_level(REG_MR, 0);
-    vTaskDelay(pdMS_TO_TICKS(1));
+    vTaskDelay(pdMS_TO_TICKS(5)); // Longer reset pulse
     gpio_set_level(REG_MR, 1);
-    vTaskDelay(pdMS_TO_TICKS(1));
+    vTaskDelay(pdMS_TO_TICKS(5)); // Wait after reset
 
-    ESP_LOGI(TAG, "Shift registers initialized");
+    // Shift out initial data (all zeros) to ensure clean state
+    shift_out_data();
+
+    // Enable outputs after everything is initialized
+    gpio_set_level(REG_OE, 0);
+    vTaskDelay(pdMS_TO_TICKS(5)); // Allow outputs to stabilize
+
+    ESP_LOGI(TAG, "Shift registers initialized successfully");
     return SLAVE_PCB_OK;
 }
 
@@ -76,8 +92,14 @@ slave_pcb_err_t init_shift_registers(void) {
 static slave_pcb_err_t shift_out_data(void) {
     ESP_LOGD(TAG, "Shifting out data to registers");
 
-    // Disable outputs during data shift
-    gpio_set_level(REG_OE, 1);
+    // NOTE: Keep outputs enabled during shift to avoid visible glitches
+    // Modern shift registers can handle this well with proper timing
+
+    // Ensure all control lines are in proper state
+    gpio_set_level(REG_DS, 0);    // Data line low initially
+    gpio_set_level(REG_STCP, 0);  // Storage clock low
+    gpio_set_level(REG_SHCP, 0);  // Shift clock low
+    esp_rom_delay_us(10); // Let signals stabilize
 
     // Shift data starting from the last register (furthest from MCU)
     for (int reg = SHIFT_REG_NUM_REGISTERS - 1; reg >= 0; reg--) {
@@ -85,25 +107,27 @@ static slave_pcb_err_t shift_out_data(void) {
         
         // Shift out 8 bits, MSB first
         for (int bit = 7; bit >= 0; bit--) {
-            // Set data line
+            // Set data line with proper setup time
             gpio_set_level(REG_DS, (data & (1 << bit)) ? 1 : 0);
+            esp_rom_delay_us(5); // Increased setup time for data stability
             
-            // Clock pulse
+            // Clock pulse with proper timing
             gpio_set_level(REG_SHCP, 1);
-            // Small delay for setup time (could be reduced or removed for faster operation)
-            esp_rom_delay_us(1);
+            esp_rom_delay_us(5); // Increased clock high time
             gpio_set_level(REG_SHCP, 0);
-            esp_rom_delay_us(1);
+            esp_rom_delay_us(5); // Increased clock low time
         }
     }
 
-    // Latch data to output registers
-    gpio_set_level(REG_STCP, 1);
-    esp_rom_delay_us(1);
-    gpio_set_level(REG_STCP, 0);
+    // Ensure data line is stable before latching
+    gpio_set_level(REG_DS, 0); // Set to known state
+    esp_rom_delay_us(10); // Increased stabilization time
 
-    // Enable outputs
-    gpio_set_level(REG_OE, 0);
+    // Latch data to output registers with proper timing
+    gpio_set_level(REG_STCP, 1);
+    esp_rom_delay_us(10); // Increased latch pulse width
+    gpio_set_level(REG_STCP, 0);
+    esp_rom_delay_us(10); // Increased latch setup time
 
     ESP_LOGD(TAG, "Data shifted out successfully");
     return SLAVE_PCB_OK;
@@ -142,14 +166,23 @@ slave_pcb_err_t shift_register_set_output_state(device_type_t device, bool state
              device, mapping->register_index, mapping->bit_position, 
              state ? "ON" : "OFF");
 
+    // Set the bit in the register data buffer
     slave_pcb_err_t ret = set_register_bit(mapping->register_index, 
                                           mapping->bit_position, state);
     if (ret != SLAVE_PCB_OK) {
+        ESP_LOGE(TAG, "Failed to set register bit for device %d", device);
         return ret;
     }
 
-    // Update all shift registers
-    return shift_out_data();
+    // Update all shift registers with better error handling
+    ret = shift_out_data();
+    if (ret != SLAVE_PCB_OK) {
+        ESP_LOGE(TAG, "Failed to shift out data for device %d", device);
+        return ret;
+    }
+
+    ESP_LOGD(TAG, "Device %d successfully set to %s", device, state ? "ON" : "OFF");
+    return SLAVE_PCB_OK;
 }
 
 /**
