@@ -18,12 +18,12 @@ esp_err_t communication_manager_init(void) {
         return ESP_FAIL;
     }
     
-    // Initialize W5500 Ethernet - DISABLED for BLE communication
-    // esp_err_t ret = w5500_ethernet_init();
-    // if (ret != ESP_OK) {
-    //     ESP_LOGE(TAG, "Failed to initialize W5500 Ethernet");
-    //     return ret;
-    // }
+    // Initialize W5500 Ethernet
+    esp_err_t ret = w5500_ethernet_init();
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize W5500 Ethernet");
+        return ret;
+    }
     
     // Create communication task
     BaseType_t result = xTaskCreate(
@@ -152,15 +152,15 @@ void communication_manager_task(void *parameters) {
         }
         
         // Send periodic state updates to SlavePCB - DISABLED for BLE communication
-        // current_state = protocol_get_state();
-        // if (current_state) {
-        //     w5500_send_state(current_state);
-        // }
+        current_state = protocol_get_state();
+        if (current_state) {
+            w5500_send_state(current_state);
+        }
         
         // Check for incoming data from SlavePCB - DISABLED for BLE communication
-        // van_command_t incoming_cmd;
-        // if (w5500_receive_command(&incoming_cmd) == ESP_OK) {
-        //     protocol_process_command(&incoming_cmd);
-        // }
+        van_command_t incoming_cmd;
+        if (w5500_receive_command(&incoming_cmd) == ESP_OK) {
+            protocol_process_command(&incoming_cmd);
+        }
     }
 }

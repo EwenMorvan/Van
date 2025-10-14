@@ -68,8 +68,8 @@ void app_main(void) {
     // ESP_LOGI(TAG, "Initializing USB manager...");
     // ESP_ERROR_CHECK(usb_manager_init());
     
-    ESP_LOGI(TAG, "Initializing BLE manager...");
-    ESP_ERROR_CHECK(ble_manager_init());
+    // ESP_LOGI(TAG, "Initializing BLE manager...");
+    // ESP_ERROR_CHECK(ble_manager_init());
     
     // ESP_LOGI(TAG, "Starting communication protocol task...");
     // ESP_ERROR_CHECK(comm_protocol_start());

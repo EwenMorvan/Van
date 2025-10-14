@@ -341,7 +341,7 @@ void button_manager_task(void *pvParameters) {
             set_output_state(DEVICE_LED_BH, hood_state);
 
             // Send BLE message for hood control
-            send_ble_hood_message(hood_state);
+            // send_ble_hood_message(hood_state);
         }
 
         // If case changed, send message to main coordinator

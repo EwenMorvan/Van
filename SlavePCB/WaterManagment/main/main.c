@@ -407,11 +407,11 @@ void app_main(void) {
     }
 
     // Initialize only essential managers
-    // ret = communication_manager_init();
-    // if (ret != SLAVE_PCB_OK) {
-    //     ESP_LOGE(TAG, "Failed to initialize Communication Manager: %s", get_error_string(ret));
-    //     return;
-    // }
+    ret = communication_manager_init();
+    if (ret != SLAVE_PCB_OK) {
+        ESP_LOGE(TAG, "Failed to initialize Communication Manager: %s", get_error_string(ret));
+        return;
+    }
 
     ret = electrovalve_pump_manager_init();
     if (ret != SLAVE_PCB_OK) {
@@ -419,11 +419,11 @@ void app_main(void) {
         return;
     }
 
-    ret = wifi_ota_init();
-    if (ret != SLAVE_PCB_OK) {
-        ESP_LOGW(TAG, "Failed to initialize WiFi OTA: %s", get_error_string(ret));
-        // Continue without WiFi/OTA - not critical for basic operation
-    }
+    // ret = wifi_ota_init();
+    // if (ret != SLAVE_PCB_OK) {
+    //     ESP_LOGW(TAG, "Failed to initialize WiFi OTA: %s", get_error_string(ret));
+    //     // Continue without WiFi/OTA - not critical for basic operation
+    // }
 
     ret = button_manager_init();
     if (ret != SLAVE_PCB_OK) {
@@ -431,20 +431,20 @@ void app_main(void) {
         return;
     }
 
-    // Initialize BLE communication
-    ret = ble_comm_init(&ble_comm, IS_ESP_A_SERVER);
-    if (ret == ESP_OK) {
-        ble_comm_set_callbacks(on_ble_connected, on_ble_disconnected, on_ble_data_received);
-        ret = ble_comm_start(&ble_comm);
-        if (ret != ESP_OK) {
-            ESP_LOGW(TAG, "Failed to start BLE Communication: %s", esp_err_to_name(ret));
-        } else {
-            ESP_LOGI(TAG, "BLE Communication initialized successfully");
-        }
-    } else {
-        ESP_LOGW(TAG, "Failed to initialize BLE Communication: %s", esp_err_to_name(ret));
-        // Continue without BLE - not critical for basic operation
-    }
+    // // Initialize BLE communication
+    // ret = ble_comm_init(&ble_comm, IS_ESP_A_SERVER);
+    // if (ret == ESP_OK) {
+    //     ble_comm_set_callbacks(on_ble_connected, on_ble_disconnected, on_ble_data_received);
+    //     ret = ble_comm_start(&ble_comm);
+    //     if (ret != ESP_OK) {
+    //         ESP_LOGW(TAG, "Failed to start BLE Communication: %s", esp_err_to_name(ret));
+    //     } else {
+    //         ESP_LOGI(TAG, "BLE Communication initialized successfully");
+    //     }
+    // } else {
+    //     ESP_LOGW(TAG, "Failed to initialize BLE Communication: %s", esp_err_to_name(ret));
+    //     // Continue without BLE - not critical for basic operation
+    // }
 
     // DISABLED: Load cell manager for now
     // ret = load_cell_manager_init();

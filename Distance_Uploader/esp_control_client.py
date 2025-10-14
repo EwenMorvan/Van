@@ -5,6 +5,8 @@ from tkinter import scrolledtext, ttk
 import os
 import time
 import re
+from PIL import Image, ImageTk  # Ajout pour affichage image
+import io
 
 # --- Configuration ---
 SERVER_IP = "192.168.1.14"  # IP du PC portable
@@ -14,9 +16,9 @@ BIN_PATHS = {
     "MainPCB_Image": r"C:\Users\Ewen\Documents\Projets\VAN\code\Van\MainPCB\VanManagement\build\VanManagement.bin",
     "MainPCB_Bootloader": r"C:\Users\Ewen\Documents\Projets\VAN\code\Van\MainPCB\VanManagement\build\bootloader\bootloader.bin",
     "MainPCB_Partition": r"C:\Users\Ewen\Documents\Projets\VAN\code\Van\MainPCB\VanManagement\build\partition_table\partition-table.bin",
-    "SlavePCB_Image": r"C:\Users\Ewen\Documents\Projets\VAN\code\Van\SlavePCB\WaterManagement\build\WaterManagement.bin",
-    "SlavePCB_Bootloader": r"C:\Users\Ewen\Documents\Projets\VAN\code\Van\SlavePCB\WaterManagement\build\bootloader\bootloader.bin",
-    "SlavePCB_Partition": r"C:\Users\Ewen\Documents\Projets\VAN\code\Van\SlavePCB\WaterManagement\build\partition_table\partition-table.bin"
+    "SlavePCB_Image": r"C:\Users\Ewen\Documents\Projets\VAN\code\Van\SlavePCB\WaterManagment\build\WaterManagment.bin",
+    "SlavePCB_Bootloader": r"C:\Users\Ewen\Documents\Projets\VAN\code\Van\SlavePCB\WaterManagment\build\bootloader\bootloader.bin",
+    "SlavePCB_Partition": r"C:\Users\Ewen\Documents\Projets\VAN\code\Van\SlavePCB\WaterManagment\build\partition_table\partition-table.bin"
 }
 
 client = None
@@ -25,8 +27,14 @@ upload_client = None  # Socket dédié pour l'upload
 
 # --- ANSI colors ---
 ANSI_COLORS = {
-    '30': 'black', '31': 'red', '32': 'green', '33': 'yellow',
-    '34': 'blue', '35': 'magenta', '36': 'cyan', '37': 'white'
+    '30': 'black',
+    '31': 'red',
+    '32': '#00FF00',  # vert flashy
+    '33': 'yellow',
+    '34': 'blue',
+    '35': 'magenta',
+    '36': 'cyan',
+    '37': 'white'
 }
 
 # --- GUI setup ---
@@ -37,15 +45,42 @@ frames = {}
 textboxes = {}
 progressbars = {}
 
+# --- Vue caméra permanente ---
+cam_frame = tk.Frame(root)
+cam_frame.grid(row=0, column=0, columnspan=2, pady=(10, 0))
+cam_label = tk.Label(cam_frame)
+cam_label.pack()
+
+def update_camera():
+    if connected:
+        try:
+            client.sendall(b"GET_CAM\n")
+        except:
+            pass
+    root.after(1000, update_camera)  # refresh every 1s
+
+def handle_camera(img_bytes):
+    try:
+        img = Image.open(io.BytesIO(img_bytes))
+        img = img.resize((400, 300))
+        photo = ImageTk.PhotoImage(img)
+        cam_label.config(image=photo)
+        cam_label.image = photo
+    except Exception as e:
+        pass
+
+root.camera_update = handle_camera
+root.after(1000, update_camera)
+
 # --- Fonction pour gérer les couleurs ANSI ---
 def insert_ansi_text(txt_widget, text):
     pattern = re.compile(r'\x1b\[(\d+;)?(\d+)m')
     last_end = 0
-    current_color = 'black'
+    current_color = 'white'  # couleur par défaut: blanc
     for m in pattern.finditer(text):
         txt_widget.insert(tk.END, text[last_end:m.start()], ('fg_'+current_color,))
         color_code = m.group(2)
-        current_color = ANSI_COLORS.get(color_code, 'black')
+        current_color = ANSI_COLORS.get(color_code, 'white')
         last_end = m.end()
     txt_widget.insert(tk.END, text[last_end:], ('fg_'+current_color,))
     txt_widget.see(tk.END)
@@ -197,21 +232,55 @@ def upload_esp_thread(name):
             upload_client.close()
             upload_client = None
 
+def send_command(cmd):
+    if connected:
+        client.sendall(f"{cmd}\n".encode())
+    else:
+        append_log("MainPCB", "[ERREUR] Pas connecté au serveur")
+
 def make_column(name, col):
     frame = tk.LabelFrame(root, text=name, padx=10, pady=10)
-    frame.grid(row=0, column=col, padx=10, pady=10, sticky="nsew")
+    frame.grid(row=1, column=col, padx=10, pady=10, sticky="nsew")
 
-    txt = scrolledtext.ScrolledText(frame, width=60, height=20)
-    txt.grid(row=1, column=0, columnspan=3, pady=(5, 10))
+    txt = scrolledtext.ScrolledText(frame, width=60, height=20, bg="black")
+    txt.grid(row=0, column=0, columnspan=1, pady=(5, 10))
     for c in ANSI_COLORS.values():
         txt.tag_configure('fg_'+c, foreground=c)
+    txt.tag_configure('fg_white', foreground='white')
 
     progress = ttk.Progressbar(frame, orient="horizontal", mode="determinate", length=300)
-    progress.grid(row=2, column=0, columnspan=3, pady=5)
+    progress.grid(row=1, column=0, columnspan=1, pady=5)
 
-    tk.Button(frame, text="Upload", command=lambda: threading.Thread(target=upload_esp_thread, args=(name,), daemon=True).start()).grid(row=0, column=0)
-    tk.Button(frame, text="Reset", command=lambda: reset_esp(name)).grid(row=0, column=1)
-    tk.Button(frame, text="Clear", command=lambda: clear_log(name)).grid(row=0, column=2)
+    tk.Button(frame, text="Upload", command=lambda: threading.Thread(target=upload_esp_thread, args=(name,), daemon=True).start()).grid(row=2, column=0, sticky="ew")
+    tk.Button(frame, text="Reset", command=lambda: reset_esp(name)).grid(row=3, column=0, sticky="ew")
+    tk.Button(frame, text="Clear", command=lambda: clear_log(name)).grid(row=4, column=0, sticky="ew")
+
+    # --- Zone boutons ronds ---
+    btn_zone = tk.Frame(frame)
+    btn_zone.grid(row=5, column=0, pady=15)
+
+    if name == "MainPCB":
+        # Bouton rond SW
+        sw_btn = tk.Canvas(btn_zone, width=60, height=60, highlightthickness=0)
+        sw_btn.grid(row=0, column=0, padx=10)
+        oval = sw_btn.create_oval(5, 5, 55, 55, fill="#e0e0e0", outline="#888", width=2)
+        sw_btn.create_text(30, 30, text="SW", font=("Arial", 14, "bold"))
+        def sw_click(event):
+            send_command("SW_CLICK")
+        sw_btn.tag_bind(oval, "<Button-1>", sw_click)
+        sw_btn.tag_bind("all", "<Button-1>", sw_click)
+
+    if name == "SlavePCB":
+        btn_names = ["BE1", "BE2", "BD1", "BD2", "BH"]
+        for i, btn in enumerate(btn_names):
+            canvas = tk.Canvas(btn_zone, width=60, height=60, highlightthickness=0)
+            canvas.grid(row=0, column=i, padx=10)
+            oval = canvas.create_oval(5, 5, 55, 55, fill="#e0e0e0", outline="#888", width=2)
+            canvas.create_text(30, 30, text=btn, font=("Arial", 14, "bold"))
+            def make_click(bname):
+                return lambda event: send_command(f"{bname}_CLICK")
+            canvas.tag_bind(oval, "<Button-1>", make_click(btn))
+            canvas.tag_bind("all", "<Button-1>", make_click(btn))
 
     frames[name] = frame
     textboxes[name] = txt
@@ -236,7 +305,15 @@ def listen_server():
                 connected = False
                 time.sleep(2)
                 continue
-            
+
+            # Gestion réception image caméra
+            if data.startswith(b"CAM_IMG:"):
+                img_bytes = data[len("CAM_IMG:"):]
+
+                if hasattr(root, "camera_update"):
+                    root.camera_update(img_bytes)
+                continue
+
             # Traiter plusieurs lignes dans un seul paquet
             lines = data.decode(errors="ignore").strip().split('\n')
             for line in lines:

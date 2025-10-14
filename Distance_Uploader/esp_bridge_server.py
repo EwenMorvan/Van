@@ -6,6 +6,8 @@ import time
 import signal
 import sys
 import os
+import cv2  # Ajout pour la webcam
+import numpy as np
 
 # ----------------------------
 # CONFIGURATION
@@ -138,6 +140,24 @@ def handle_client(conn, addr):
             cmd = data.decode().strip()
             print(f"[CMD] {cmd}")
 
+            # Ajout gestion commande caméra
+            if cmd == "GET_CAM":
+                try:
+                    cap = cv2.VideoCapture(0)
+                    ret, frame = cap.read()
+                    cap.release()
+                    if ret:
+                        # Encode en JPEG
+                        _, img_encoded = cv2.imencode('.jpg', frame)
+                        img_bytes = img_encoded.tobytes()
+                        # Envoi au client
+                        conn.sendall(b"CAM_IMG:" + img_bytes)
+                    else:
+                        print("[ERREUR] Capture caméra échouée")
+                except Exception as e:
+                    print(f"[ERREUR CAM] {e}")
+                continue
+
             if cmd.startswith("UPLOAD_"):
                 target = cmd.split("_")[1]
                 print(f"[INFO] Début upload pour {target}")
@@ -250,6 +270,24 @@ def handle_client(conn, addr):
                     conn.sendall(f"OK:RESET_{target}\n".encode())
                 else:
                     conn.sendall(f"ERROR:Target {target} not found\n".encode())
+            elif cmd.endswith("_CLICK"):
+                # Simulation d'un click bouton
+                target = None
+                if cmd == "SW_CLICK":
+                    target = "MainPCB"
+                else:
+                    # Pour SlavePCB: BE1_CLICK, etc.
+                    for btn in ["BE1", "BE2", "BD1", "BD2", "BH"]:
+                        if cmd == f"{btn}_CLICK":
+                            target = "SlavePCB"
+                            break
+                if target and target in serials:
+                    # Envoyer sur le port série (simuler un événement)
+                    serials[target].write((cmd + "\n").encode())
+                    conn.sendall(f"OK:{cmd}\n".encode())
+                else:
+                    conn.sendall(f"ERROR:Target for {cmd} not found\n".encode())
+                continue
 
     except Exception as e:
         print(f"[ERREUR CLIENT] {e}")
