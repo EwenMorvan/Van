@@ -1,0 +1,8 @@
+<resources>
+    <!-- Button_tab -->
+    <dimen name="tab_button_stroke">4dp</dimen>
+    <dimen name="tab_button_stroke_selected">5dp</dimen>
+    <dimen name="tab_button_padding">20dp</dimen>
+    <dimen name="tab_button_padding_bottom">25dp</dimen>
+
+</resources>

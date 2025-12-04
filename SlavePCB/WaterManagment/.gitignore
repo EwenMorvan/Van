@@ -58,3 +58,5 @@ docs/build/
 # Local configuration
 local_config.h
 local_secrets.h
+
+Old_codes/

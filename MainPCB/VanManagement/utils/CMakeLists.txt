@@ -1,0 +1,10 @@
+idf_component_register(
+    SRCS 
+        "json_builder.c"
+        "battery_parser.c"
+    INCLUDE_DIRS 
+        "."
+    REQUIRES 
+        "common_includes"
+        "json"
+)

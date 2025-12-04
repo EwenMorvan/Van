@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960"
+    android:autoMirrored="true">
+    
+    <!-- Barres avec coins arrondis, alignées en bas -->
+    <path
+        android:strokeWidth="100"
+        android:strokeColor="@android:color/white"
+        android:strokeLineCap="round"
+        android:pathData="M90,800 L90,680 M280,800 L280,600 M480,800 L480,480 M670,800 L670,360 M870,800 L870,200"/>
+    
+</vector>

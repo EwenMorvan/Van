@@ -1,0 +1,966 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/card_side_margin"
+    android:layout_marginBottom="@dimen/card_side_margin"
+    android:layout_marginStart="@dimen/card_side_margin"
+    android:layout_marginEnd="@dimen/card_side_margin"
+    android:background="@drawable/card_container">
+
+    <!-- Header -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/card_header">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="🔋 Battery Details"
+            android:textSize="@dimen/text_size_xlarge"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:padding="@dimen/padding_medium" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Content -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/header_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:maxHeight="600dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_large">
+
+            <!-- SOC Section (Top, Full Width) -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/soc_section_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <!-- Separator Line after SOC -->
+                <TextView
+                    android:id="@+id/soc_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SOC"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_large"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="@+id/separator_after_soc"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <View
+                    android:id="@+id/separator_after_soc"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:background="@color/white"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/soc_title"
+                    app:layout_constraintWidth_percent="0.9" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/status_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/separator_after_soc">
+
+                    <ImageView
+                        android:id="@+id/energy_logo"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/energy_logo"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/battery_status_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="IDLE"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_large"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/energy_logo"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <ProgressBar
+                    android:id="@+id/soc_progress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/card_button_large"
+                    android:layout_marginHorizontal="@dimen/margin_large"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:max="100"
+                    android:progress="50"
+                    android:progressDrawable="@drawable/soc_progress_drawable"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/status_layout" />
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/soc_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/soc_progress">
+
+                    <View
+                        android:id="@+id/separator"
+                        android:layout_width="1dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="@dimen/margin_small"
+                        android:layout_marginEnd="@dimen/margin_small"
+                        android:background="@color/white"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/soc_value_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/margin_medium"
+                        android:text="--%"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_large"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/separator"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/capacity_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_medium"
+                        android:text="---.-Ah"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_large"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/separator"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:id="@+id/separator_after_batt_details"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/battery_details_title"
+                app:layout_constraintWidth_percent="0.9" />
+
+            <!-- Battery Details Title -->
+            <TextView
+                android:id="@+id/battery_details_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_large"
+                android:text="Battery Details"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_large"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/separator_after_batt_details"
+                app:layout_constraintTop_toBottomOf="@+id/soc_section_layout" />
+
+            <!-- Left and Right Columns Layout -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/first_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_large"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/separator_after_batt_details">
+
+                <!-- Guideline to split in 2 columns -->
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline_center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.5" />
+
+                <!-- Left Column -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/margin_medium"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/guideline_center"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <!-- Guideline for label end -->
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/left_guideline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.5" />
+
+                    <!-- Voltage -->
+                    <TextView
+                        android:id="@+id/voltage_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:text="Voltage:"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium"
+                        app:layout_constraintEnd_toStartOf="@id/left_guideline"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/voltage_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_medium"
+                        android:text="--.--V"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_large"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/left_guideline"
+                        app:layout_constraintTop_toTopOf="@id/voltage_label" />
+
+                    <!-- Current -->
+                    <TextView
+                        android:id="@+id/current_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_small"
+                        android:gravity="end"
+                        android:text="Current:"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium"
+                        app:layout_constraintEnd_toStartOf="@id/left_guideline"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/voltage_label" />
+
+                    <TextView
+                        android:id="@+id/current_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_medium"
+                        android:text="--.-A"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_large"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/left_guideline"
+                        app:layout_constraintTop_toTopOf="@id/current_label" />
+
+                    <!-- Power -->
+                    <TextView
+                        android:id="@+id/power_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_small"
+                        android:gravity="end"
+                        android:text="Power:"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium"
+                        app:layout_constraintEnd_toStartOf="@id/left_guideline"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/current_label" />
+
+                    <TextView
+                        android:id="@+id/power_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_medium"
+                        android:text="--.-W"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_large"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/left_guideline"
+                        app:layout_constraintTop_toTopOf="@id/power_label" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- Vertical Line -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:background="@drawable/spacer_line"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHeight_percent="0.9"
+                    app:layout_constraintStart_toStartOf="@id/guideline_center"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <!-- Right Column -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/guideline_center"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <!-- Guideline for label end -->
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/right_guideline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.6" />
+
+                    <!-- Health -->
+                    <TextView
+                        android:id="@+id/health_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:text="Health:"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium"
+                        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/health_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_medium"
+                        android:text="--%"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_large"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/right_guideline"
+                        app:layout_constraintTop_toTopOf="@id/health_label" />
+
+                    <!-- Cycles -->
+                    <TextView
+                        android:id="@+id/cycles_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_small"
+                        android:gravity="end"
+                        android:text="Cycles:"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium"
+                        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/health_label" />
+
+                    <TextView
+                        android:id="@+id/cycles_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_medium"
+                        android:text="-"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_large"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/right_guideline"
+                        app:layout_constraintTop_toTopOf="@id/cycles_label" />
+
+                    <!-- Charge Mos -->
+                    <TextView
+                        android:id="@+id/charge_mos_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_small"
+                        android:gravity="end"
+                        android:text="Charge Mos:"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium"
+                        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/cycles_label" />
+
+                    <TextView
+                        android:id="@+id/charge_mos_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_medium"
+                        android:text="❌"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_large"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/right_guideline"
+                        app:layout_constraintTop_toTopOf="@id/charge_mos_label" />
+
+                    <!-- Discharge Mos -->
+                    <TextView
+                        android:id="@+id/discharge_mos_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_small"
+                        android:gravity="end"
+                        android:text="Discharge Mos:"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium"
+                        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/charge_mos_label" />
+
+                    <TextView
+                        android:id="@+id/discharge_mos_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_medium"
+                        android:text="❌"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_large"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/right_guideline"
+                        app:layout_constraintTop_toTopOf="@id/discharge_mos_label" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Separator Line after Details -->
+            <View
+                android:id="@+id/separator_after_details"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cells_title"
+                app:layout_constraintWidth_percent="0.9" />
+
+            <!-- Cells Title -->
+            <TextView
+                android:id="@+id/cells_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_large"
+                android:text="Cell Voltages"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_large"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/separator_after_details"
+                app:layout_constraintTop_toBottomOf="@+id/first_layout" />
+
+            <!-- Cells Layout -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cells_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/cells_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="@dimen/margin_large">
+
+                <!-- Guidelines for cells -->
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/cell_guideline_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.25" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/cell_guideline_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.5" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/cell_guideline_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.75" />
+
+                <!-- Cell 1 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toStartOf="@id/cell_guideline_1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ProgressBar
+                        android:id="@+id/cell_bg_1"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="@dimen/cell_width"
+                        android:layout_height="@dimen/cell_height"
+                        android:max="100"
+                        android:progress="50"
+                        android:progressDrawable="@drawable/cell_progress"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/cell_cap_1" />
+
+                    <View
+                        android:id="@+id/cell_cap_1"
+                        android:layout_width="20dp"
+                        android:layout_height="3dp"
+                        android:background="@drawable/cell_cap"
+                        app:layout_constraintEnd_toEndOf="@id/cell_bg_1"
+                        app:layout_constraintStart_toStartOf="@id/cell_bg_1"
+                        app:layout_constraintTop_toBottomOf="@+id/cell_balance_1" />
+
+                    <ImageView
+                        android:id="@+id/cell_balance_1"
+                        android:layout_width="@dimen/margin_xxlarge"
+                        android:layout_height="@dimen/margin_xxlarge"
+                        android:src="@drawable/energy_logo"
+                        app:tint="@color/warning"
+                        android:visibility="visible"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/cell_voltage_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--.--V"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_large"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/cell_bg_1" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- Separator 1 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="@id/cell_guideline_1"
+                    app:layout_constraintStart_toStartOf="@id/cell_guideline_1"
+                    app:layout_constraintTop_toBottomOf="@id/cell_bg_1">
+
+                    <TextView
+                        android:id="@+id/temp_1_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/margin_small"
+                        android:text="🌡️ --.-°C"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="@dimen/cell_height"
+                        android:background="@color/white" />
+
+                </LinearLayout>
+
+                <!-- Cell 2 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/cell_guideline_1"
+                    app:layout_constraintEnd_toStartOf="@id/cell_guideline_2">
+
+                    <ProgressBar
+                        android:id="@+id/cell_bg_2"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="@dimen/cell_width"
+                        android:layout_height="@dimen/cell_height"
+                        android:progress="50"
+                        android:max="100"
+                        android:progressDrawable="@drawable/cell_progress"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/cell_cap_2"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                    <View
+                        android:id="@+id/cell_cap_2"
+                        android:layout_width="20dp"
+                        android:layout_height="3dp"
+                        android:background="@drawable/cell_cap"
+                        app:layout_constraintTop_toBottomOf="@+id/cell_balance_2"
+                        app:layout_constraintStart_toStartOf="@id/cell_bg_2"
+                        app:layout_constraintEnd_toEndOf="@id/cell_bg_2" />
+
+                    <ImageView
+                        android:id="@+id/cell_balance_2"
+                        android:layout_width="@dimen/margin_xxlarge"
+                        android:layout_height="@dimen/margin_xxlarge"
+                        android:src="@drawable/energy_logo"
+                        app:tint="@color/warning"
+                        android:visibility="visible"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/cell_voltage_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--.--V"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_large"
+                        app:layout_constraintTop_toBottomOf="@id/cell_bg_2"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- Separator 2 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="@id/cell_guideline_2"
+                    app:layout_constraintStart_toStartOf="@id/cell_guideline_2"
+                    app:layout_constraintTop_toBottomOf="@id/cell_bg_2">
+
+                    <TextView
+                        android:id="@+id/temp_2_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/margin_small"
+                        android:text="🌡️ --.-°C"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="@dimen/cell_height"
+                        android:background="@color/white" />
+
+                </LinearLayout>
+
+                <!-- Cell 3 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/cell_guideline_2"
+                    app:layout_constraintEnd_toStartOf="@id/cell_guideline_3">
+
+                    <ProgressBar
+                        android:id="@+id/cell_bg_3"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="@dimen/cell_width"
+                        android:layout_height="@dimen/cell_height"
+                        android:progress="50"
+                        android:max="100"
+                        android:progressDrawable="@drawable/cell_progress"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/cell_cap_3"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                    <View
+                        android:id="@+id/cell_cap_3"
+                        android:layout_width="20dp"
+                        android:layout_height="3dp"
+                        android:background="@drawable/cell_cap"
+                        app:layout_constraintTop_toBottomOf="@+id/cell_balance_3"
+                        app:layout_constraintStart_toStartOf="@id/cell_bg_3"
+                        app:layout_constraintEnd_toEndOf="@id/cell_bg_3" />
+
+                    <ImageView
+                        android:id="@+id/cell_balance_3"
+                        android:layout_width="@dimen/margin_xxlarge"
+                        android:layout_height="@dimen/margin_xxlarge"
+                        android:src="@drawable/energy_logo"
+                        app:tint="@color/warning"
+                        android:visibility="visible"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/cell_voltage_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--.--V"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_large"
+                        app:layout_constraintTop_toBottomOf="@id/cell_bg_3"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- Separator 3 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="@id/cell_guideline_3"
+                    app:layout_constraintStart_toStartOf="@id/cell_guideline_3"
+                    app:layout_constraintTop_toBottomOf="@id/cell_bg_3">
+
+                    <TextView
+                        android:id="@+id/temp_3_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/margin_small"
+                        android:text="🌡️ --.-°C"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="@dimen/cell_height"
+                        android:background="@color/white" />
+
+                </LinearLayout>
+
+                <!-- Cell 4 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/cell_guideline_3"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <ProgressBar
+                        android:id="@+id/cell_bg_4"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="@dimen/cell_width"
+                        android:layout_height="@dimen/cell_height"
+                        android:progress="50"
+                        android:max="100"
+                        android:progressDrawable="@drawable/cell_progress"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/cell_cap_4"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                    <View
+                        android:id="@+id/cell_cap_4"
+                        android:layout_width="20dp"
+                        android:layout_height="3dp"
+                        android:background="@drawable/cell_cap"
+                        app:layout_constraintTop_toBottomOf="@+id/cell_balance_4"
+                        app:layout_constraintStart_toStartOf="@id/cell_bg_4"
+                        app:layout_constraintEnd_toEndOf="@id/cell_bg_4" />
+
+                    <ImageView
+                        android:id="@+id/cell_balance_4"
+                        android:layout_width="@dimen/margin_xxlarge"
+                        android:layout_height="@dimen/margin_xxlarge"
+                        android:src="@drawable/energy_logo"
+                        app:tint="@color/warning"
+                        android:visibility="visible"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/cell_voltage_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--.--V"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_large"
+                        app:layout_constraintTop_toBottomOf="@id/cell_bg_4"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Protection Status -->
+            <View
+                android:id="@+id/separator_after_cells"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/protection_title"
+                app:layout_constraintWidth_percent="0.9"
+               />
+
+            <TextView
+                android:id="@+id/protection_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_large"
+                android:text="Protection Status"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_large"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/separator_after_cells"
+                app:layout_constraintStart_toStartOf="@+id/separator_after_cells"
+                app:layout_constraintTop_toBottomOf="@+id/cells_layout" />
+
+            <!-- Protection Status Content -->
+            <LinearLayout
+                android:id="@+id/protection_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@id/protection_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="@dimen/margin_large">
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2"
+                    android:rowCount="7">
+
+                    <TextView
+                        android:id="@+id/prot_single_overvoltage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔴 Single Cell Overvoltage"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <TextView
+                        android:id="@+id/prot_single_undervoltage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔴 Single Cell Undervoltage"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <TextView
+                        android:id="@+id/prot_pack_overvoltage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔴 Whole Pack Overvoltage"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <TextView
+                        android:id="@+id/prot_pack_undervoltage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔴 Whole Pack Undervoltage"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <TextView
+                        android:id="@+id/prot_charge_overtemp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔴 Charging Over-temperature"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <TextView
+                        android:id="@+id/prot_charge_lowtemp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔴 Charging Low Temperature"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <TextView
+                        android:id="@+id/prot_discharge_overtemp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔴 Discharge Over Temperature"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <TextView
+                        android:id="@+id/prot_discharge_lowtemp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔴 Discharge Low Temperature"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <TextView
+                        android:id="@+id/prot_charge_overcurrent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔴 Charging Overcurrent"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <TextView
+                        android:id="@+id/prot_discharge_overcurrent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔴 Discharge Overcurrent"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <TextView
+                        android:id="@+id/prot_short_circuit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔴 Short Circuit Protection"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <TextView
+                        android:id="@+id/prot_ic_error"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔴 Front-end Detection IC Error"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <TextView
+                        android:id="@+id/prot_software_lock"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔴 Software Lock MOS"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                </GridLayout>
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

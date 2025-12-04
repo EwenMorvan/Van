@@ -1,0 +1,10 @@
+idf_component_register(
+    SRCS 
+        "slave_pcb_res/slave_pcb_error_manager.c"
+        "error_manager.c"
+    INCLUDE_DIRS 
+        "."
+    REQUIRES
+        "esp_timer"
+        "driver"
+)

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true">
+        <shape android:shape="oval">
+            <solid android:color="@color/tab_button_background"/>
+            <stroke
+                android:color="@color/button_selected"
+                android:width="@dimen/tab_button_stroke_selected"
+                />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/tab_button_background"/>
+            <stroke
+                android:color="@color/white"
+                android:width="@dimen/tab_button_stroke"
+                />
+        </shape>
+    </item>
+</selector>

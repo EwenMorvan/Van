@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ligne de fond pour la scrollbar (gris clair transparent) -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="line">
+            <stroke
+                android:width="2dp"
+                android:color="#4DFFFFFF" />
+            <size android:height="2dp" />
+        </shape>
+    </item>
+</layer-list>

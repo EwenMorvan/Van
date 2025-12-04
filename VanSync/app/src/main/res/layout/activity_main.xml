@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Image de fond qui ne se déforme pas -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg"
+         />
+
+    <!-- Votre layout principal par-dessus -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <!-- Bluetooth Status
+    <LinearLayout
+        android:id="@+id/ble_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
+
+        <ImageView
+            android:id="@+id/bluetooth_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_bluetooth"
+            app:tint="@color/disconnected" />
+
+        <TextView
+            android:id="@+id/bluetooth_status"
+
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Déconnecté" />
+
+        <Button
+            android:id="@+id/connect_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Connecter" />
+
+    </LinearLayout>
+    -->
+        <!-- Top layout -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/top_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/margin_large"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/top_layout_spacer"
+            android:layout_width="@dimen/card_stroke"
+            android:layout_height="0dp"
+            android:background="@drawable/spacer_line"
+            app:layout_constraintHeight_percent="0.8"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <!-- Ble staut -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ble_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/margin_large"
+            android:background="@drawable/light_mode_button_bg"
+            android:paddingStart="@dimen/padding_medium"
+            android:paddingTop="@dimen/padding_medium"
+            android:paddingEnd="@dimen/padding_small"
+            android:paddingBottom="@dimen/padding_medium"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- Icône Bluetooth -->
+            <ImageView
+                android:id="@+id/iv_bluetooth_bg"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/round_filled"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/disconnected" />
+
+            <ImageView
+                android:id="@+id/iv_bluetooth"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_margin="@dimen/margin_small"
+                android:src="@drawable/ic_bluetooth"
+                app:layout_constraintBottom_toBottomOf="@+id/iv_bluetooth_bg"
+                app:layout_constraintEnd_toEndOf="@+id/iv_bluetooth_bg"
+                app:layout_constraintStart_toStartOf="@+id/iv_bluetooth_bg"
+                app:layout_constraintTop_toTopOf="@+id/iv_bluetooth_bg" />
+
+            <!-- Textes -->
+            <LinearLayout
+                android:id="@+id/bluetooth_status"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_small"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/iv_bluetooth_bg"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/bluetooth_status_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Connected"
+                    android:textColor="#212121"
+                    android:textSize="@dimen/text_size_medium"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/bluetooth_services_status_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Services Ready"
+                    android:textColor="#757575"
+                    android:textSize="@dimen/text_size_small" />
+            </LinearLayout>
+
+            <!-- Icône Signal -->
+            <ImageView
+                android:id="@+id/iv_signal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_cell_level_1"
+                android:layout_marginEnd="@dimen/margin_large"
+                android:layout_marginStart="@dimen/margin_large"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/bluetooth_status"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- System staut -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/system_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/light_mode_button_bg"
+            app:layout_constraintStart_toEndOf="@+id/guideline"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginHorizontal="@dimen/margin_large"
+            android:paddingStart="@dimen/padding_medium"
+            android:paddingEnd="@dimen/padding_large"
+            android:paddingTop="@dimen/padding_medium"
+            android:paddingBottom="@dimen/padding_medium"
+            >
+
+            <!-- Icône Status -->
+            <ImageView
+                android:id="@+id/system_status_bg"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="1"
+                android:src="@drawable/round_filled"
+                app:tint="@color/connected"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/system_status_logo"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/ic_ok_logo"
+                android:layout_margin="@dimen/margin_medium"
+                app:layout_constraintBottom_toBottomOf="@+id/system_status_bg"
+                app:layout_constraintEnd_toEndOf="@+id/system_status_bg"
+                app:layout_constraintStart_toStartOf="@+id/system_status_bg"
+                app:layout_constraintTop_toTopOf="@+id/system_status_bg" />
+
+            <!-- Textes -->
+            <LinearLayout
+                android:id="@+id/system_health"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintStart_toEndOf="@id/system_status_bg"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginStart="@dimen/margin_small"
+                android:layout_marginEnd="@dimen/margin_medium">
+
+                <TextView
+                    android:id="@+id/system_health_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="System Health"
+                    android:textColor="#212121"
+                    android:textSize="@dimen/text_size_medium"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/system_health_uptime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Uptime: 100j:22h:37m:12s"
+                    android:textColor="#757575"
+                    android:textSize="@dimen/text_size_small"
+                    />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- overview layout -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/overview_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/top_layout"
+        app:layout_constraintBottom_toTopOf="@+id/flow_buttons"
+        >
+        <FrameLayout
+            android:id="@+id/content_container"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flow_buttons"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="@dimen/tab_button_padding_bottom"
+            app:constraint_referenced_ids="tab_button_home,tab_button_light,tab_button_water,tab_button_heater,tab_button_energy,tab_button_multimedia"
+            app:flow_horizontalStyle="spread"
+            app:flow_wrapMode="none"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHeight_percent="0.06" />
+
+        <ImageButton
+            android:id="@+id/tab_button_home"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/round_tab_button"
+            android:padding="@dimen/tab_button_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/home_logo"
+            app:layout_constraintBottom_toBottomOf="@id/flow_buttons"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintTop_toTopOf="@id/flow_buttons"
+            app:tint="@android:color/white" />
+
+        <ImageButton
+            android:id="@+id/tab_button_light"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/round_tab_button"
+            android:padding="@dimen/tab_button_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/light_logo"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toBottomOf="@id/flow_buttons"
+            app:layout_constraintTop_toTopOf="@id/flow_buttons"
+            app:tint="@android:color/white" />
+
+        <ImageButton
+            android:id="@+id/tab_button_water"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/round_tab_button"
+            android:padding="@dimen/tab_button_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/water_logo"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toBottomOf="@id/flow_buttons"
+            app:layout_constraintTop_toTopOf="@id/flow_buttons"
+            app:tint="@android:color/white" />
+
+        <ImageButton
+            android:id="@+id/tab_button_heater"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/round_tab_button"
+            android:padding="@dimen/tab_button_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/heater_logo"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toBottomOf="@id/flow_buttons"
+            app:layout_constraintTop_toTopOf="@id/flow_buttons"
+            app:tint="@android:color/white" />
+
+        <ImageButton
+            android:id="@+id/tab_button_energy"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/round_tab_button"
+            android:padding="@dimen/tab_button_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/energy_logo"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toBottomOf="@id/flow_buttons"
+            app:layout_constraintTop_toTopOf="@id/flow_buttons"
+            app:tint="@android:color/white" />
+
+        <ImageButton
+            android:id="@+id/tab_button_multimedia"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/round_tab_button"
+            android:padding="@dimen/tab_button_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/fan_logo"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toBottomOf="@id/flow_buttons"
+            app:layout_constraintTop_toTopOf="@id/flow_buttons"
+            app:tint="@android:color/white" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Loading Overlay (masque le flash des tabs pendant le préchargement) -->
+
+        <FrameLayout
+            android:id="@+id/loading_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#CC000000"
+            android:clickable="true"
+            android:elevation="100dp"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ProgressBar
+                    android:id="@+id/loading_spinner"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:indeterminateTint="@color/button_selected" />
+
+                <TextView
+                    android:id="@+id/loading_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Loading..."
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+</RelativeLayout>

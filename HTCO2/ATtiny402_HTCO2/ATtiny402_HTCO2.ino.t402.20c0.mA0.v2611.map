@@ -1,0 +1,133 @@
+
+
+Symbols from C:\Users\Ewen\AppData\Local\arduino\sketches\13B07EAA6C925481F9FE8FE7E3C89171/ATtiny402_HTCO2.ino.elf:
+
+Name                  Value   Class        Type         Size     Line  Section
+
+__heap_end          |00000000|   W  |            NOTYPE|        |     |*ABS*
+__TEXT_REGION_ORIGIN__|00000000|   W  |            NOTYPE|        |     |*ABS*
+__tmp_reg__         |00000000|   a  |            NOTYPE|        |     |*ABS*
+__vector_default    |00000000|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:63
+__vectors           |00000000|   T  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:63
+__zero_reg__        |00000001|   a  |            NOTYPE|        |     |*ABS*
+__FUSE_REGION_LENGTH__|0000000a|   A  |            NOTYPE|        |     |*ABS*
+__CCP__             |00000034|   a  |            NOTYPE|        |     |*ABS*
+__ctors_start       |00000034|   T  |            NOTYPE|        |     |.text
+__trampolines_end   |00000034|   T  |            NOTYPE|        |     |.text
+__trampolines_start |00000034|   T  |            NOTYPE|        |     |.text
+__ctors_end         |00000036|   T  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:230
+__dtors_end         |00000036|   T  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:230
+__dtors_start       |00000036|   T  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:230
+__init              |00000036|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:230
+__SP_L__            |0000003d|   a  |            NOTYPE|        |     |*ABS*
+__SP_H__            |0000003e|   a  |            NOTYPE|        |     |*ABS*
+__SREG__            |0000003f|   a  |            NOTYPE|        |     |*ABS*
+_initThreeStuff()   |00000042|   T  |              FUNC|00000018|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/main.cpp:149
+__do_clear_bss      |0000005a|   T  |            NOTYPE|00000010|     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:2441
+.do_clear_bss_loop  |00000062|   t  |            NOTYPE|        |     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:2446
+.do_clear_bss_start |00000064|   t  |            NOTYPE|        |     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:2448
+__do_global_ctors   |0000006a|   T  |            NOTYPE|00000014|     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:2466
+__EEPROM_REGION_LENGTH__|00000080|   A  |            NOTYPE|        |     |*ABS*
+__bad_interrupt     |00000082|   T  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_1          |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_10         |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_11         |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_12         |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_13         |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_14         |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_15         |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_16         |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_17         |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_18         |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_2          |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_20         |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_21         |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_25         |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_3          |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_4          |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_5          |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_6          |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_7          |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+__vector_8          |00000082|   W  |            NOTYPE|        |     |.text	../../../../../crt1/gcrt1.S:209
+unsigned char TwoWire::masterTransmit<unsigned char>(unsigned char*, unsigned char*, unsigned char, unsigned char) [clone .constprop.30]|00000084|   t  |              FUNC|000000a6|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\libraries\Wire\src/Wire.cpp:831
+__DATA_REGION_LENGTH__|00000100|   A  |            NOTYPE|        |     |*ABS*
+delay.part.0        |0000012a|   t  |              FUNC|0000004c|     |.text
+TwoWire::available()|00000176|   t  |              FUNC|0000000c|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\libraries\Wire\src/Wire.cpp:990
+Print::write(unsigned char const*, unsigned int)|00000182|   t  |              FUNC|0000005a|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore\api/Print.cpp:29
+HardwareSerial::availableForWrite()|000001dc|   t  |              FUNC|0000001e|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:719
+HardwareSerial::read()|000001fa|   t  |              FUNC|00000028|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:703
+HardwareSerial::peek()|00000222|   t  |              FUNC|0000001c|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:695
+HardwareSerial::available()|0000023e|   t  |              FUNC|00000016|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:691
+HardwareSerial::_poll_tx_data_empty()|00000254|   t  |              FUNC|0000003e|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:423
+_poll_dre_done      |00000290|   t  |            NOTYPE|        |     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:477
+HardwareSerial::write(unsigned char)|00000292|   t  |              FUNC|00000094|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:759
+HardwareSerial::flush()|00000326|   t  |              FUNC|00000028|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:728
+TwoWire::flush()    |0000034e|   t  |              FUNC|00000010|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\libraries\Wire\src/Wire.cpp:1115
+TwoWire::peek()     |0000035e|   t  |              FUNC|00000028|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\libraries\Wire\src/Wire.cpp:1095
+TwoWire::read()     |00000386|   t  |              FUNC|00000024|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\libraries\Wire\src/Wire.cpp:1015
+TwoWire::write(unsigned char)|000003aa|   t  |              FUNC|00000024|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\libraries\Wire\src/Wire.cpp:928
+TwoWire::write(int) [clone .constprop.27]|000003ce|   t  |              FUNC|00000008|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\libraries\Wire\src/Wire.h:290
+TwoWire::write(unsigned char const*, unsigned int)|000003d6|   t  |              FUNC|00000046|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\libraries\Wire\src/Wire.cpp:966
+__LOCK_REGION_LENGTH__|00000400|   A  |            NOTYPE|        |     |*ABS*
+__SIGNATURE_REGION_LENGTH__|00000400|   A  |            NOTYPE|        |     |*ABS*
+__USER_SIGNATURE_REGION_LENGTH__|00000400|   A  |            NOTYPE|        |     |*ABS*
+Print::availableForWrite()|0000041c|   t  |              FUNC|00000006|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore\api/Print.h:65
+Print::printNumber(unsigned long, unsigned char) [clone .constprop.15]|00000422|   t  |              FUNC|0000008c|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore\api/Print.cpp:215
+Print::print(long, int) [clone .part.3] [clone .constprop.13]|000004ae|   t  |              FUNC|0000003e|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore\api/Print.cpp:86
+pinMode             |000004ec|   t  |              FUNC|0000004a|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/wiring_digital.c:41
+__vector_9          |00000536|   T  |              FUNC|0000005e|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/wiring_micros_ISR.h:835
+ovf_end             |00000552|   t  |            NOTYPE|        |     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/wiring_micros_ISR.h:950
+sub4                |0000056c|   t  |            NOTYPE|        |     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/wiring_micros_ISR.h:950
+sub_end             |00000586|   t  |            NOTYPE|        |     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/wiring_micros_ISR.h:950
+__vector_23         |00000594|   T  |              FUNC|0000000c|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART0.cpp:113
+__vector_22         |000005a0|   T  |              FUNC|0000000c|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART0.cpp:90
+__vector_24         |000005ac|   T  |              FUNC|0000000a|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART0.cpp:54
+_do_dre             |000005b6|   t  |            NOTYPE|        |     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:384
+_do_dre()           |000005b6|   T  |              FUNC|0000005a|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:301
+_poll_dre           |000005c6|   t  |            NOTYPE|        |     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:384
+_done_dre_irq       |000005f2|   t  |            NOTYPE|        |     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:384
+_do_rxc             |00000610|   t  |            NOTYPE|        |     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:249
+_do_rxc()           |00000610|   T  |              FUNC|0000005a|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:171
+_end_rxc            |0000064e|   t  |            NOTYPE|        |     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:249
+_buff_full_rxc      |00000666|   t  |            NOTYPE|        |     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:249
+_do_txc             |0000066a|   t  |            NOTYPE|        |     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:124
+_do_txc()           |0000066a|   T  |              FUNC|00000032|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:88
+_txc_flush_rx       |0000067c|   t  |            NOTYPE|        |     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART.cpp:124
+__vector_19         |0000069c|   T  |              FUNC|0000014c|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\libraries\Wire\src/Wire.cpp:1421
+global constructors keyed to 65535_0_ATtiny402_HTCO2.ino.cpp.o.2699|000007e8|   t  |              FUNC|00000056|     |.text
+main                |0000083e|   T  |              FUNC|000003a8|     |.text	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/main.cpp:49
+__udivmodsi4        |00000be6|   T  |            NOTYPE|00000044|     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:1638
+__udivmodsi4_loop   |00000bf2|   t  |            NOTYPE|        |     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:1646
+__udivmodsi4_ep     |00000c0c|   t  |            NOTYPE|        |     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:1660
+__divmodsi4         |00000c2a|   T  |            NOTYPE|00000028|     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:1686
+__divmodsi4_neg2    |00000c42|   t  |            NOTYPE|        |     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:1701
+__divmodsi4_exit    |00000c50|   t  |            NOTYPE|        |     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:1709
+__negsi2            |00000c52|   T  |            NOTYPE|00000010|     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:1718
+__umulhisi3         |00000c62|   T  |            NOTYPE|00000018|     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:564
+__tablejump2__      |00000c7a|   T  |            NOTYPE|0000000c|     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:2296
+_exit               |00000c86|   T  |            NOTYPE|        |     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:2278
+exit                |00000c86|   W  |            NOTYPE|        |     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:2278
+__stop_program      |00000c88|   t  |            NOTYPE|        |     |.text	/home/admin/Arduino/toolchain-avr-special-master/gcc-build/avr/avrxmega3/short-calls/libgcc/../../../../../gcc/libgcc/config/avr/lib1funcs.S:2280
+_etext              |00000c8a|   T  |            NOTYPE|        |     |.text
+__data_load_end     |00000ccb|   A  |            NOTYPE|        |     |*ABS*
+__data_load_start   |00000ccb|   a  |            NOTYPE|        |     |*ABS*
+__TEXT_REGION_LENGTH__|00001000|   A  |            NOTYPE|        |     |*ABS*
+__stack             |00003fff|   W  |            NOTYPE|        |     |*ABS*
+__RODATA_PM_OFFSET__|00008000|   A  |            NOTYPE|        |     |*ABS*
+_usart_pins         |00008c8a|   r  |            OBJECT|00000008|     |.rodata
+digital_pin_to_bit_position|00008c92|   r  |            OBJECT|00000006|     |.rodata	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\variants\txy2/pins_arduino.h:170
+digital_pin_to_port |00008c98|   r  |            OBJECT|00000006|     |.rodata	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\variants\txy2/pins_arduino.h:160
+digital_pin_to_bit_mask|00008c9e|   r  |            OBJECT|00000006|     |.rodata	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\variants\txy2/pins_arduino.h:180
+vtable for HardwareSerial|00008ca4|   r  |            OBJECT|00000012|     |.rodata
+vtable for TwoWire  |00008cb6|   r  |            OBJECT|00000012|     |.rodata
+__bss_start         |00803f00|   B  |            NOTYPE|        |     |.bss
+__DATA_REGION_ORIGIN__|00803f00|   A  |            NOTYPE|        |     |*ABS*
+_edata              |00803f00|   D  |            NOTYPE|        |     |.data
+sleepStack          |00803f00|   b  |            OBJECT|00000001|     |.bss	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\libraries\Wire\src/Wire.cpp:43
+timingStruct        |00803f01|   b  |            OBJECT|0000000a|     |.bss	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/wiring.c:67
+Serial0             |00803f0b|   b  |            OBJECT|00000031|     |.bss	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\cores\megatinycore/UART0.cpp:130
+twi0_wire           |00803f3c|   b  |            OBJECT|00000002|     |.bss	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\libraries\Wire\src/Wire.cpp:48
+Wire                |00803f3e|   b  |            OBJECT|00000035|     |.bss	C:\Users\Ewen\AppData\Local\Arduino15\packages\megaTinyCore\hardware\megaavr\2.6.12\libraries\Wire\src/Wire.cpp:1503
+__bss_end           |00803f73|   B  |            NOTYPE|        |     |.bss
+_end                |00803f73|   N  |            NOTYPE|        |     |.comment
+__eeprom_end        |00810000|   N  |            NOTYPE|        |     |.comment

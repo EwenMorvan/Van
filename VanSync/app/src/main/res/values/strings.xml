@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Van Management</string>
+    
+    <!-- Actions -->
+    <string name="connect">Connecter</string>
+    <string name="disconnect">Déconnecter</string>
+    <string name="scanning">Recherche...</string>
+    <string name="connected">Connecté</string>
+    <string name="disconnected">Déconnecté</string>
+    <string name="settings">Paramètres</string>
+    
+    <!-- System -->
+    <string name="system_status">État du système</string>
+    <string name="uptime">Temps de fonctionnement</string>
+    <string name="slave_pcb">PCB secondaire</string>
+    <string name="errors">Erreurs</string>
+    
+    <!-- Sensors -->
+    <string name="sensors">Capteurs</string>
+    <string name="fuel_level">Niveau carburant</string>
+    <string name="cabin_temperature">Température cabine</string>
+    <string name="humidity">Humidité</string>
+    <string name="co2_level">Niveau CO2</string>
+    <string name="light_level">Luminosité</string>
+    
+    <!-- Heater -->
+    <string name="heater">Chauffage</string>
+    <string name="heater_power">Marche/Arrêt</string>
+    <string name="water_temperature">Température eau</string>
+    <string name="cabin_temp_target">Température cabine cible</string>
+    <string name="current_water_temp">Température eau actuelle</string>
+    <string name="pump_status">État pompe</string>
+    
+    <!-- MPPT -->
+    <string name="solar_panels">Panneaux solaires</string>
+    <string name="mppt_100_50">MPPT 100/50</string>
+    <string name="mppt_70_15">MPPT 70/15</string>
+    <string name="solar_power">Puissance</string>
+    <string name="battery_voltage">Tension batterie</string>
+    <string name="battery_current">Courant batterie</string>
+    
+    <!-- LEDs -->
+    <string name="lighting">Éclairage</string>
+    <string name="roof_leds">LEDs plafond</string>
+    <string name="exterior_leds">LEDs extérieur</string>
+    <string name="brightness">Luminosité</string>
+    <string name="mode">Mode</string>
+    
+    <!-- Fans -->
+    <string name="ventilation">Ventilation</string>
+    <string name="elec_box_fan">Ventilateur boîtier électrique</string>
+    <string name="heater_fan">Ventilateur chauffage</string>
+    <string name="hood_fan">Hotte aspirante</string>
+    <string name="fan_speed">Vitesse ventilateur</string>
+    
+    <!-- Settings -->
+    <string name="auto_connect">Connexion automatique</string>
+    <string name="auto_connect_desc">Se connecter automatiquement au van au démarrage</string>
+    <string name="keep_screen_on">Garder écran allumé</string>
+    <string name="keep_screen_on_desc">Empêcher la mise en veille de l\'écran</string>
+    <string name="dark_theme">Thème sombre</string>
+    <string name="dark_theme_desc">Utiliser le thème sombre</string>
+    <string name="notification_interval">Intervalle de notification</string>
+    <string name="notification_interval_desc">Fréquence de mise à jour des données</string>
+    
+    <!-- Units -->
+    <string name="celsius">°C</string>
+    <string name="percent">%</string>
+    <string name="watts">W</string>
+    <string name="volts">V</string>
+    <string name="amperes">A</string>
+    <string name="ppm">ppm</string>
+    <string name="milliseconds">ms</string>
+    <string name="seconds">s</string>
+    
+    <!-- Messages -->
+    <string name="bluetooth_not_supported">Bluetooth non supporté</string>
+    <string name="bluetooth_required">Bluetooth requis pour le fonctionnement</string>
+    <string name="permissions_required">Permissions requises pour le fonctionnement</string>
+    <string name="van_connected">Connecté au van</string>
+    <string name="van_disconnected">Déconnecté du van</string>
+    <string name="command_failed">Échec d\'envoi de commande</string>
+    <string name="no_connection">Pas de connexion</string>
+    <string name="services_discovered">Services découverts - Prêt</string>
+</resources>

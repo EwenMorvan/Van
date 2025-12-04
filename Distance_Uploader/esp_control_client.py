@@ -7,9 +7,10 @@ import time
 import re
 from PIL import Image, ImageTk  # Ajout pour affichage image
 import io
+import websocket
 
 # --- Configuration ---
-SERVER_IP = "192.168.1.14"  # IP du PC portable
+SERVER_IP = "192.168.1.16"  # IP du PC portable
 SERVER_PORT = 5000
 
 BIN_PATHS = {
@@ -46,31 +47,61 @@ textboxes = {}
 progressbars = {}
 
 # --- Vue caméra permanente ---
-cam_frame = tk.Frame(root)
-cam_frame.grid(row=0, column=0, columnspan=2, pady=(10, 0))
-cam_label = tk.Label(cam_frame)
-cam_label.pack()
+cam_frame = tk.Frame(root, bg="#888")
+cam_frame.grid(row=0, column=0, columnspan=2, pady=(10, 0), sticky="ew")
+cam_label = tk.Label(cam_frame, bg="#888")
+cam_label.pack(padx=10, pady=10)
 
-def update_camera():
-    if connected:
-        try:
-            client.sendall(b"GET_CAM\n")
-        except:
-            pass
-    root.after(1000, update_camera)  # refresh every 1s
+# Placeholder "No image"
+def show_placeholder():
+    img = Image.new("RGB", (400, 300), "#888")
+    from PIL import ImageDraw, ImageFont
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.load_default()
+    text = "No image"
+    bbox = draw.textbbox((0, 0), text, font=font)
+    w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    draw.text(((400-w)//2, (300-h)//2), text, fill="white", font=font)
+    photo = ImageTk.PhotoImage(img)
+    cam_label.config(image=photo)
+    cam_label.image = photo
 
-def handle_camera(img_bytes):
-    try:
-        img = Image.open(io.BytesIO(img_bytes))
-        img = img.resize((400, 300))
-        photo = ImageTk.PhotoImage(img)
-        cam_label.config(image=photo)
-        cam_label.image = photo
-    except Exception as e:
-        pass
+show_placeholder()
+root.has_image = False
 
-root.camera_update = handle_camera
-root.after(1000, update_camera)
+def video_receiver():
+    def on_data(ws, message, opcode, fin):
+        # opcode 2 = binary frame
+        if opcode == websocket.ABNF.OPCODE_BINARY:
+            try:
+                img = Image.open(io.BytesIO(message))
+                img = img.resize((400, 300))
+                photo = ImageTk.PhotoImage(img)
+                cam_label.config(image=photo)
+                cam_label.image = photo
+                root.has_image = True
+            except Exception:
+                show_placeholder()
+                root.has_image = False
+
+    def on_error(ws, error):
+        show_placeholder()
+        root.has_image = False
+
+    def on_close(ws, close_status_code, close_msg):
+        show_placeholder()
+        root.has_image = False
+
+    ws = websocket.WebSocketApp(
+        "ws://192.168.1.16:8765",
+        on_data=on_data,
+        on_error=on_error,
+        on_close=on_close
+    )
+    ws.run_forever()
+
+# Démarrer le client WebSocket dans un thread séparé
+threading.Thread(target=video_receiver, daemon=True).start()
 
 # --- Fonction pour gérer les couleurs ANSI ---
 def insert_ansi_text(txt_widget, text):
@@ -86,8 +117,17 @@ def insert_ansi_text(txt_widget, text):
     txt_widget.see(tk.END)
 
 def append_log(name, msg):
-    txt = textboxes[name]
-    insert_ansi_text(txt, msg + "\n")
+	# Si le terminal est gelé, stocker dans le tampon au lieu d'insérer
+	if freeze_flags.get(name, False):
+		buf = freeze_buffers.setdefault(name, [])
+		buf.append(msg + "\n")
+		# Mettre à jour le texte du bouton pour afficher la taille du tampon
+		btn = freeze_buttons.get(name)
+		if btn:
+			btn.config(text=f"Unfreeze ({len(buf)})", bg="#d9534f")
+		return
+	txt = textboxes[name]
+	insert_ansi_text(txt, msg + "\n")
 
 def clear_log(name):
     textboxes[name].delete(1.0, tk.END)
@@ -238,53 +278,119 @@ def send_command(cmd):
     else:
         append_log("MainPCB", "[ERREUR] Pas connecté au serveur")
 
+# --- Ajout : mécanisme hold pour envoi continu tant que la souris est maintenue ---
+hold_flags = {}  # clé = commande, valeur = bool
+
+def _send_repeat(cmd, interval=0.001):
+    # envoie immédiatement puis en boucle tant que le flag est True
+    try:
+        send_command(cmd)
+    except Exception:
+        pass
+    while hold_flags.get(cmd):
+        try:
+            time.sleep(interval)
+            if not hold_flags.get(cmd):
+                break
+            send_command(cmd)
+        except Exception:
+            pass
+
+def start_hold(cmd, interval=0.1):
+    if hold_flags.get(cmd):
+        return
+    hold_flags[cmd] = True
+    t = threading.Thread(target=_send_repeat, args=(cmd, interval), daemon=True)
+    t.start()
+
+def stop_hold(cmd):
+    hold_flags[cmd] = False
+
+# --- Ajout global : gestion freeze par terminal ---
+freeze_flags = {}     # name -> bool
+freeze_buffers = {}   # name -> list[str]
+freeze_buttons = {}   # name -> tk.Button (pour mettre à jour l'affichage)
+
+def toggle_freeze(name):
+	# bascule l'état et, si on dégel, vide le buffer dans le terminal
+	if freeze_flags.get(name):
+		# dégel : vider le tampon
+		freeze_flags[name] = False
+		buf = freeze_buffers.get(name, [])
+		if buf:
+			txt = textboxes.get(name)
+			if txt:
+				for m in buf:
+					insert_ansi_text(txt, m)
+			freeze_buffers[name] = []
+		btn = freeze_buttons.get(name)
+		if btn:
+			btn.config(text="Freeze", bg=None)
+	else:
+		# gel
+		freeze_flags[name] = True
+		btn = freeze_buttons.get(name)
+		if btn:
+			btn.config(text=f"Unfreeze (0)", bg="#d9534f")
+
 def make_column(name, col):
-    frame = tk.LabelFrame(root, text=name, padx=10, pady=10)
-    frame.grid(row=1, column=col, padx=10, pady=10, sticky="nsew")
+	frame = tk.LabelFrame(root, text=name, padx=10, pady=10)
+	frame.grid(row=1, column=col, padx=10, pady=10, sticky="nsew")
 
-    txt = scrolledtext.ScrolledText(frame, width=60, height=20, bg="black")
-    txt.grid(row=0, column=0, columnspan=1, pady=(5, 10))
-    for c in ANSI_COLORS.values():
-        txt.tag_configure('fg_'+c, foreground=c)
-    txt.tag_configure('fg_white', foreground='white')
+	txt = scrolledtext.ScrolledText(frame, width=100, height=20, bg="black")
+	txt.grid(row=0, column=0, columnspan=1, pady=(5, 10))
+	for c in ANSI_COLORS.values():
+		txt.tag_configure('fg_'+c, foreground=c)
+	txt.tag_configure('fg_white', foreground='white')
 
-    progress = ttk.Progressbar(frame, orient="horizontal", mode="determinate", length=300)
-    progress.grid(row=1, column=0, columnspan=1, pady=5)
+	progress = ttk.Progressbar(frame, orient="horizontal", mode="determinate", length=300)
+	progress.grid(row=1, column=0, columnspan=1, pady=5)
 
-    tk.Button(frame, text="Upload", command=lambda: threading.Thread(target=upload_esp_thread, args=(name,), daemon=True).start()).grid(row=2, column=0, sticky="ew")
-    tk.Button(frame, text="Reset", command=lambda: reset_esp(name)).grid(row=3, column=0, sticky="ew")
-    tk.Button(frame, text="Clear", command=lambda: clear_log(name)).grid(row=4, column=0, sticky="ew")
+	tk.Button(frame, text="Upload", command=lambda: threading.Thread(target=upload_esp_thread, args=(name,), daemon=True).start()).grid(row=2, column=0, sticky="ew")
+	tk.Button(frame, text="Reset", command=lambda: reset_esp(name)).grid(row=3, column=0, sticky="ew")
+	tk.Button(frame, text="Clear", command=lambda: clear_log(name)).grid(row=4, column=0, sticky="ew")
 
-    # --- Zone boutons ronds ---
-    btn_zone = tk.Frame(frame)
-    btn_zone.grid(row=5, column=0, pady=15)
+	# Bouton Freeze / Unfreeze
+	fz_btn = tk.Button(frame, text="Freeze", command=lambda n=name: toggle_freeze(n))
+	fz_btn.grid(row=6, column=0, sticky="ew", pady=(4,0))
+	# stocker le bouton pour mise à jour du label (taille du buffer)
+	freeze_buttons[name] = fz_btn
+	# initialiser flags/tampons
+	freeze_flags[name] = False
+	freeze_buffers[name] = []
 
-    if name == "MainPCB":
-        # Bouton rond SW
-        sw_btn = tk.Canvas(btn_zone, width=60, height=60, highlightthickness=0)
-        sw_btn.grid(row=0, column=0, padx=10)
-        oval = sw_btn.create_oval(5, 5, 55, 55, fill="#e0e0e0", outline="#888", width=2)
-        sw_btn.create_text(30, 30, text="SW", font=("Arial", 14, "bold"))
-        def sw_click(event):
-            send_command("SW_CLICK")
-        sw_btn.tag_bind(oval, "<Button-1>", sw_click)
-        sw_btn.tag_bind("all", "<Button-1>", sw_click)
+	# --- Zone boutons ronds ---
+	btn_zone = tk.Frame(frame)
+	btn_zone.grid(row=5, column=0, pady=15)
 
-    if name == "SlavePCB":
-        btn_names = ["BE1", "BE2", "BD1", "BD2", "BH"]
-        for i, btn in enumerate(btn_names):
-            canvas = tk.Canvas(btn_zone, width=60, height=60, highlightthickness=0)
-            canvas.grid(row=0, column=i, padx=10)
-            oval = canvas.create_oval(5, 5, 55, 55, fill="#e0e0e0", outline="#888", width=2)
-            canvas.create_text(30, 30, text=btn, font=("Arial", 14, "bold"))
-            def make_click(bname):
-                return lambda event: send_command(f"{bname}_CLICK")
-            canvas.tag_bind(oval, "<Button-1>", make_click(btn))
-            canvas.tag_bind("all", "<Button-1>", make_click(btn))
+	if name == "MainPCB":
+		# Bouton rond SW (maintien possible)
+		sw_btn = tk.Canvas(btn_zone, width=60, height=60, highlightthickness=0)
+		sw_btn.grid(row=0, column=0, padx=10)
+		oval = sw_btn.create_oval(5, 5, 55, 55, fill="#e0e0e0", outline="#888", width=2)
+		sw_btn.create_text(30, 30, text="SW", font=("Arial", 14, "bold"))
+		# Bind press/release pour envoi continu tant que la souris est maintenue
+		sw_cmd = "SW_CLICK"
+		sw_btn.bind("<ButtonPress-1>", lambda e, c=sw_cmd: start_hold(c))
+		sw_btn.bind("<ButtonRelease-1>", lambda e, c=sw_cmd: stop_hold(c))
+		sw_btn.bind("<Leave>", lambda e, c=sw_cmd: stop_hold(c))
 
-    frames[name] = frame
-    textboxes[name] = txt
-    progressbars[name] = progress
+	if name == "SlavePCB":
+		btn_names = ["BE1", "BE2", "BD1", "BD2", "BH", "BV1", "BV2"]
+		for i, btn in enumerate(btn_names):
+			canvas = tk.Canvas(btn_zone, width=60, height=60, highlightthickness=0)
+			canvas.grid(row=0, column=i, padx=10)
+			oval = canvas.create_oval(5, 5, 55, 55, fill="#e0e0e0", outline="#888", width=2)
+			canvas.create_text(30, 30, text=btn, font=("Arial", 14, "bold"))
+			cmd_name = f"{btn}_CLICK"
+			# press/release pour envoi continu
+			canvas.bind("<ButtonPress-1>", lambda e, c=cmd_name: start_hold(c))
+			canvas.bind("<ButtonRelease-1>", lambda e, c=cmd_name: stop_hold(c))
+			canvas.bind("<Leave>", lambda e, c=cmd_name: stop_hold(c))
+
+	frames[name] = frame
+	textboxes[name] = txt
+	progressbars[name] = progress
 
 make_column("MainPCB", 0)
 make_column("SlavePCB", 1)
@@ -303,6 +409,7 @@ def listen_server():
             data = client.recv(4096)
             if not data:
                 connected = False
+                show_placeholder()
                 time.sleep(2)
                 continue
 
@@ -313,6 +420,10 @@ def listen_server():
                 if hasattr(root, "camera_update"):
                     root.camera_update(img_bytes)
                 continue
+
+            # Si aucune image reçue, affiche le placeholder
+            if not root.has_image:
+                show_placeholder()
 
             # Traiter plusieurs lignes dans un seul paquet
             lines = data.decode(errors="ignore").strip().split('\n')
@@ -374,6 +485,7 @@ def connect_server():
     connected = True
     root.title("Connecté au serveur")
     print("[CLIENT] Connecté au serveur")
+    # request_camera()  # SUPPRIMER : le flux vidéo est géré par WebSocket
 
 threading.Thread(target=listen_server, daemon=True).start()
 

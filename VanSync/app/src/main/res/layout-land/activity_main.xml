@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Image de fond qui ne se déforme pas -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg"
+        />
+
+    <!-- Votre layout principal par-dessus -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Bluetooth Status -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:id="@+id/bluetooth_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_bluetooth"
+                app:tint="@color/disconnected" />
+
+            <TextView
+                android:id="@+id/bluetooth_status"
+
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="Déconnecté" />
+
+            <Button
+                android:id="@+id/connect_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Connecter" />
+
+        </LinearLayout>
+
+
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/flow_buttons"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="@dimen/tab_button_padding_bottom"
+            app:constraint_referenced_ids="tab_button_home,tab_button_energy,tab_button_light,tab_button_water,tab_button_heater,tab_button_fan"
+            app:flow_horizontalStyle="spread"
+            app:flow_wrapMode="none"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHeight_percent="0.1" />
+
+        <ImageButton
+            android:id="@+id/tab_button_home"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/round_tab_button"
+            android:padding="@dimen/tab_button_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/home_logo"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toBottomOf="@id/flow_buttons"
+            app:layout_constraintTop_toTopOf="@id/flow_buttons"
+            app:tint="@android:color/white" />
+
+        <ImageButton
+            android:id="@+id/tab_button_energy"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/round_tab_button"
+            android:padding="@dimen/tab_button_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/energy_logo"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toBottomOf="@id/flow_buttons"
+            app:layout_constraintTop_toTopOf="@id/flow_buttons"
+            app:tint="@android:color/white" />
+
+        <ImageButton
+            android:id="@+id/tab_button_light"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/round_tab_button"
+            android:padding="@dimen/tab_button_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/light_logo"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toBottomOf="@id/flow_buttons"
+            app:layout_constraintTop_toTopOf="@id/flow_buttons"
+            app:tint="@android:color/white" />
+
+        <ImageButton
+            android:id="@+id/tab_button_water"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/round_tab_button"
+            android:padding="@dimen/tab_button_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/water_logo"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toBottomOf="@id/flow_buttons"
+            app:layout_constraintTop_toTopOf="@id/flow_buttons"
+            app:tint="@android:color/white" />
+
+        <ImageButton
+            android:id="@+id/tab_button_heater"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/round_tab_button"
+            android:padding="@dimen/tab_button_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/heater_logo"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toBottomOf="@id/flow_buttons"
+            app:layout_constraintTop_toTopOf="@id/flow_buttons"
+            app:tint="@android:color/white" />
+
+        <ImageButton
+            android:id="@+id/tab_button_fan"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/round_tab_button"
+            android:padding="@dimen/tab_button_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/fan_logo"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toBottomOf="@id/flow_buttons"
+            app:layout_constraintTop_toTopOf="@id/flow_buttons"
+            app:tint="@android:color/white" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

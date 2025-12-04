@@ -1,0 +1,52 @@
+<resources>
+    <!-- Text sizes -->
+    <dimen name="text_size_small">12sp</dimen>
+    <dimen name="text_size_medium">14sp</dimen>
+    <dimen name="text_size_large">16sp</dimen>
+    <dimen name="text_size_xlarge">20sp</dimen>
+    <dimen name="text_size_xxlarge">32sp</dimen>
+
+
+    <!-- Margins and padding -->
+    <dimen name="margin_small">4dp</dimen>
+    <dimen name="margin_medium">8dp</dimen>
+    <dimen name="margin_large">16dp</dimen>
+    <dimen name="margin_xlarge">28dp</dimen>
+    <dimen name="margin_xxlarge">40dp</dimen>
+
+
+    <dimen name="padding_small">4dp</dimen>
+    <dimen name="padding_medium">8dp</dimen>
+    <dimen name="padding_large">16dp</dimen>
+    <dimen name="padding_xlarge">24dp</dimen>
+    <dimen name="padding_xxlarge">40dp</dimen>
+
+    <!-- Button_tab -->
+    <dimen name="tab_button_stroke">3dp</dimen>
+    <dimen name="tab_button_stroke_selected">4dp</dimen>
+    <dimen name="tab_button_padding">15dp</dimen>
+    <dimen name="tab_button_padding_bottom">20dp</dimen>
+
+    <!-- Card -->
+    <dimen name="card_stroke">4dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="card_corner_radius">20dp</dimen>
+    <dimen name="card_side_margin">20dp</dimen>
+
+    <dimen name="card_button_large">50dp</dimen>
+    <dimen name="card_button_medium">40dp</dimen>
+    <dimen name="card_separator_small">2dp</dimen>
+
+
+    <dimen name="battery_gauge_bg_stroke">20dp</dimen>
+    <dimen name="water_tank_radius">15dp</dimen>
+
+    <dimen name="strip_setup_height">50dp</dimen>
+    <dimen name="zoom_btn">40dp</dimen>
+    <dimen name="zoom_btn_txt">20dp</dimen>
+
+    <dimen name="cell_height">120dp</dimen>
+    <dimen name="cell_width">60dp</dimen>
+
+
+</resources>

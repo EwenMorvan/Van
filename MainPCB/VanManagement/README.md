@@ -10,6 +10,7 @@ This is the ESP-IDF project for the MainPCB van controller system. The MainPCB m
 - **Sensor Management**: Monitors fuel, temperature, humidity, CO2, and light sensors
 - **Fan Control**: PWM control for cooling fans and heater radiator fans
 - **Communication**: Ethernet communication with SlavePCB, USB/BLE for mobile apps
+- **Multi-App BLE Support**: Up to 3 mobile apps can connect simultaneously 📱📱📱
 - **Error Handling**: Comprehensive error detection and visual/audible notifications
 
 ## Hardware Requirements
@@ -164,6 +165,12 @@ Enable debug logging by setting log level in menuconfig:
 Component config → Log output → Default log verbosity → Debug
 ```
 
-## License
+## Multi-App BLE Support 📱
 
-This project is part of the van electronics system. Refer to the main project documentation for licensing information.
+The system supports **up to 3 mobile apps** connecting simultaneously to the ESP32-S3.
+
+**Features:**
+- ✅ All apps receive real-time van state updates
+- ✅ Commands from multiple apps are handled (first command has priority)
+- ✅ Automatic reconnection and connection management
+- ✅ Up to 4 BLE connections total (3 apps + 1 external device like battery)

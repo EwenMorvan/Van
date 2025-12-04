@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#C9282828">
+
+    <!-- Popup Card -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/popup_card"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/card_side_margin"
+        android:layout_marginBottom="@dimen/card_side_margin"
+        android:layout_marginStart="@dimen/card_side_margin"
+        android:layout_marginEnd="@dimen/card_side_margin"
+        android:background="@drawable/card_container"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintWidth_percent="0.85"
+        android:elevation="8dp">
+
+        <!-- Header avec titre centré -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/header_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="@drawable/card_header">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="⚠️ Bluetooth Disconnected"
+                android:textSize="@dimen/text_size_xlarge"
+                android:textColor="@color/warning"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:padding="@dimen/padding_medium" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Content -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/content_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/header_layout"
+            app:layout_constraintStart_toStartOf="@id/header_layout"
+            app:layout_constraintEnd_toEndOf="@id/header_layout"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:padding="@dimen/padding_xlarge">
+
+            <!-- Bluetooth Icon with Animation -->
+            <ImageView
+                android:id="@+id/bluetooth_icon_popup"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_bluetooth"
+                android:scaleType="fitCenter"
+                app:tint="@android:color/holo_blue_dark"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="@dimen/margin_medium" />
+
+            <!-- Status Message -->
+            <TextView
+                android:id="@+id/status_message"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Connection Lost"
+                android:textSize="@dimen/text_size_xxlarge"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:gravity="center"
+                app:layout_constraintTop_toBottomOf="@id/bluetooth_icon_popup"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="@dimen/margin_xlarge" />
+
+            <!-- Separator Line -->
+            <View
+                android:id="@+id/separator_top"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:background="@drawable/spacer_line"
+                app:layout_constraintTop_toBottomOf="@id/status_message"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintWidth_percent="0.8"
+                android:layout_marginTop="@dimen/margin_xlarge" />
+
+            <!-- Info Container -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/info_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/separator_top"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="@dimen/margin_xlarge">
+
+                <!-- Connection Status -->
+                <TextView
+                    android:id="@+id/connection_status_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Status:"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_large"
+                    android:gravity="end"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/info_guideline"
+                    android:layout_marginEnd="@dimen/margin_medium" />
+
+                <TextView
+                    android:id="@+id/connection_status_value"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Disconnected"
+                    android:textColor="@color/disconnected"
+                    android:textSize="@dimen/text_size_large"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="@id/connection_status_label"
+                    app:layout_constraintStart_toEndOf="@id/info_guideline"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginStart="@dimen/margin_medium" />
+
+                <!-- Device Name -->
+                <TextView
+                    android:id="@+id/device_name_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Device:"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_large"
+                    android:gravity="end"
+                    app:layout_constraintTop_toBottomOf="@id/connection_status_label"
+                    app:layout_constraintStart_toStartOf="@id/connection_status_label"
+                    app:layout_constraintEnd_toEndOf="@id/connection_status_label"
+                    android:layout_marginTop="@dimen/margin_large" />
+
+                <TextView
+                    android:id="@+id/device_name_value"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="VanManager"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_large"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="@id/device_name_label"
+                    app:layout_constraintStart_toStartOf="@id/connection_status_value"
+                    app:layout_constraintEnd_toEndOf="@id/connection_status_value" />
+
+                <!-- Reconnection Attempts -->
+                <TextView
+                    android:id="@+id/reconnect_attempts_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Attempts:"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_large"
+                    android:gravity="end"
+                    app:layout_constraintTop_toBottomOf="@id/device_name_label"
+                    app:layout_constraintStart_toStartOf="@id/connection_status_label"
+                    app:layout_constraintEnd_toEndOf="@id/connection_status_label"
+                    android:layout_marginTop="@dimen/margin_large" />
+
+                <TextView
+                    android:id="@+id/reconnect_attempts_value"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="0 / 5"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_large"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="@id/reconnect_attempts_label"
+                    app:layout_constraintStart_toStartOf="@id/connection_status_value"
+                    app:layout_constraintEnd_toEndOf="@id/connection_status_value" />
+
+                <!-- Action -->
+                <TextView
+                    android:id="@+id/action_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Action:"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_large"
+                    android:gravity="end"
+                    app:layout_constraintTop_toBottomOf="@id/reconnect_attempts_label"
+                    app:layout_constraintStart_toStartOf="@id/connection_status_label"
+                    app:layout_constraintEnd_toEndOf="@id/connection_status_label"
+                    android:layout_marginTop="@dimen/margin_large" />
+
+                <TextView
+                    android:id="@+id/action_value"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Searching..."
+                    android:textColor="@color/warning"
+                    android:textSize="@dimen/text_size_large"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="@id/action_label"
+                    app:layout_constraintStart_toStartOf="@id/connection_status_value"
+                    app:layout_constraintEnd_toEndOf="@id/connection_status_value" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/info_guideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.45" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Separator Line -->
+            <View
+                android:id="@+id/separator_bottom"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:background="@drawable/spacer_line"
+                app:layout_constraintTop_toBottomOf="@id/info_container"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintWidth_percent="0.8"
+                android:layout_marginTop="@dimen/margin_xlarge" />
+
+            <!-- Help Text -->
+            <TextView
+                android:id="@+id/help_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="• Check Bluetooth is enabled\n• Ensure van is powered on\n• Stay within range (10m)\n• Auto-reconnect is active"
+                android:textSize="@dimen/text_size_medium"
+                android:textColor="@color/white"
+                android:gravity="start"
+                android:alpha="0.8"
+                app:layout_constraintTop_toBottomOf="@id/separator_bottom"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="@dimen/margin_large"
+                android:layout_marginBottom="@dimen/margin_large" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

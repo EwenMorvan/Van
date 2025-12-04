@@ -1,0 +1,31 @@
+idf_component_register(
+    SRCS 
+        # "mppt_manager.c"
+        "switch_manager.c"
+        "led_manager.c"
+        "led_coordinator.c"
+        "led_static_modes.c"
+        "led_dynamic_modes.c"
+        "led_command_handler.c"
+        "hood_manager.c"
+        "fan_manager.c"
+        "pump_manager.c"
+        "heater_manager.c"
+        "battery_manager.c"
+        "mppt_manager.c"
+        "inverter_chargers_manager.c"
+        "energy_simulation.c"
+        "videoprojecteur_manager.c"
+        "htco2_sensor_manager.c"
+    INCLUDE_DIRS 
+        "."
+    REQUIRES 
+        "communications"
+        "common_includes"
+        "freertos"
+        "driver"
+        "esp_timer"
+        "esp_adc"
+        "led_strip"
+       
+)

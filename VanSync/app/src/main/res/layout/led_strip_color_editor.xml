@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Layout pour éditer les couleurs d'un strip LED -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/margin_xxlarge"
+    android:paddingEnd="@dimen/margin_xxlarge"
+    android:paddingTop="@dimen/margin_medium"
+    android:paddingBottom="@dimen/margin_large">
+
+    <!-- Header avec nom du strip et bouton supprimer -->
+    <TextView
+        android:id="@+id/strip_name_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Strip 1"
+        android:textSize="@dimen/text_size_large"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/strip_remove_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="✖"
+        android:textSize="@dimen/text_size_large"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:background="@drawable/light_mode_button_bg"
+        android:paddingStart="@dimen/padding_small"
+        android:paddingEnd="@dimen/padding_small"
+        android:paddingTop="@dimen/padding_small"
+        android:paddingBottom="@dimen/padding_small"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/strip_name_label"
+        app:layout_constraintBottom_toBottomOf="@id/strip_name_label"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Checkbox "Copy strip 1" (visible seulement pour strip 2) -->
+    <CheckBox
+        android:id="@+id/copy_strip_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Copy Strip 1"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_medium"
+        android:buttonTint="@color/button_selected"
+        android:visibility="gone"
+        android:layout_marginTop="@dimen/margin_medium"
+        app:layout_constraintTop_toBottomOf="@id/strip_name_label"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Contenu des paramètres (peut être caché si Copy est coché) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/strip_settings_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_medium"
+        app:layout_constraintTop_toBottomOf="@id/copy_strip_checkbox"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Contrôle de la largeur du crayon -->
+        <TextView
+            android:id="@+id/brush_width_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🖌️ Brush Width:"
+            android:textSize="@dimen/text_size_medium"
+            android:textColor="@color/white"
+            android:layout_marginTop="@dimen/margin_large"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <SeekBar
+            android:id="@+id/brush_width_slider"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:min="1"
+            android:max="20"
+            android:progress="1"
+            android:layout_marginStart="@dimen/margin_medium"
+            android:layout_marginEnd="@dimen/margin_small"
+            app:layout_constraintTop_toTopOf="@id/brush_width_label"
+            app:layout_constraintBottom_toBottomOf="@id/brush_width_label"
+            app:layout_constraintStart_toEndOf="@id/brush_width_label"
+            app:layout_constraintEnd_toStartOf="@id/brush_preview" />
+
+        <!-- Aperçu du crayon -->
+        <View
+            android:id="@+id/brush_preview"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="@dimen/margin_small"
+            app:layout_constraintTop_toTopOf="@id/brush_width_label"
+            app:layout_constraintBottom_toBottomOf="@id/brush_width_label"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Visualisation du strip LED -->
+        <com.van.management.ui.views.LedStripCanvas
+            android:id="@+id/led_strip_canvas"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/strip_setup_height"
+            android:background="@drawable/light_mode_button_bg"
+            android:layout_marginTop="@dimen/margin_xlarge"
+            app:layout_constraintTop_toBottomOf="@id/brush_width_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Contrôles de zoom -->
+        <TextView
+            android:id="@+id/zoom_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Zoom:"
+            android:textSize="@dimen/text_size_medium"
+            android:textColor="@color/white"
+            android:layout_marginTop="@dimen/margin_xxlarge"
+            app:layout_constraintTop_toBottomOf="@id/led_strip_canvas"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/zoom_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/zoom_label">
+
+            <Button
+                android:id="@+id/zoom_out_button"
+                android:layout_width="@dimen/zoom_btn"
+                android:layout_height="@dimen/zoom_btn"
+                android:background="@drawable/light_mode_button_bg"
+                android:layout_marginEnd="@dimen/margin_xlarge"
+                android:text="-"
+                android:textColor="@color/white"
+                android:textSize="@dimen/zoom_btn_txt"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/zoom_in_button"
+                android:layout_width="@dimen/zoom_btn"
+                android:layout_height="@dimen/zoom_btn"
+                android:layout_marginStart="@dimen/margin_xlarge"
+                android:background="@drawable/light_mode_button_bg"
+                android:text="+"
+                android:textColor="@color/white"
+                android:textSize="@dimen/zoom_btn_txt"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/zoom_out_button"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </LinearLayout>
+        <!-- Scrollbar horizontale pour navigation -->
+        <SeekBar
+            android:id="@+id/strip_scrollbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:min="0"
+            android:max="100"
+            android:progress="0"
+            android:layout_marginTop="@dimen/margin_large"
+            android:visibility="visible"
+            android:progressDrawable="@drawable/strip_scrollbar_progress"
+            android:thumb="@drawable/strip_scrollbar_thumb"
+            android:splitTrack="false"
+            app:layout_constraintTop_toBottomOf="@id/zoom_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Palette de couleurs -->
+        <TextView
+            android:id="@+id/color_picker_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Color:"
+            android:textSize="@dimen/text_size_medium"
+            android:textColor="@color/white"
+            android:layout_marginTop="@dimen/margin_large"
+            app:layout_constraintTop_toBottomOf="@id/strip_scrollbar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_goneMarginTop="@dimen/margin_large" />
+
+        <!-- Palette de couleurs prédéfinies -->
+        <LinearLayout
+            android:id="@+id/color_palette"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintTop_toBottomOf="@id/color_picker_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_goneMarginTop="@dimen/margin_small">
+
+            <!-- Les boutons de couleur seront ajoutés dynamiquement -->
+
+        </LinearLayout>
+
+        <!-- Boutons d'actions -->
+        <LinearLayout
+            android:id="@+id/action_buttons_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/margin_large"
+            app:layout_constraintTop_toBottomOf="@id/color_palette"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Bouton Reset -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/reset_button"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/card_button_medium"
+                android:layout_weight="1"
+                android:layout_marginEnd="@dimen/margin_small"
+                android:background="@drawable/light_mode_button_bg"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reset"
+                    android:textSize="@dimen/text_size_medium"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Bouton Divide -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/divide_button"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/card_button_medium"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/margin_small"
+                android:layout_marginEnd="@dimen/margin_small"
+                android:background="@drawable/light_mode_button_bg"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Divide"
+                    android:textSize="@dimen/text_size_medium"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Bouton Apply Gradient -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/gradient_button"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/card_button_medium"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/margin_small"
+                android:background="@drawable/light_mode_button_bg"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gradient"
+                    android:textSize="@dimen/text_size_medium"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Séparateur -->
+    <View
+        android:id="@+id/strip_separator"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/card_separator_small"
+        android:background="@drawable/spacer_line"
+        android:layout_marginTop="@dimen/margin_medium"
+        app:layout_constraintTop_toBottomOf="@id/strip_settings_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

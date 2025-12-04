@@ -1,0 +1,10 @@
+idf_component_register(
+    SRCS 
+        "utils.c"
+        "error_manager.c"
+    INCLUDE_DIRS 
+        "."
+    REQUIRES
+        "esp_timer"
+        "driver"
+)

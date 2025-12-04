@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material Design colors (requis par les thèmes Android) -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    
+    <!-- Primary colors -->
+    <color name="primary">#2196F3</color>
+    <color name="primary_dark">#000000</color>
+    <color name="primary_light">#BBDEFB</color>
+    <color name="accent">#FF5722</color>
+    
+    <!-- Status colors -->
+    <color name="connected">#4CAF50</color>
+    <color name="disconnected">#F44336</color>
+    <color name="warning">#FFC107</color>
+    <color name="error">#F44336</color>
+
+    <!-- Tab Button background -->
+    <color name="tab_button_background">#99DADADA</color>
+
+    <!-- Card background -->
+    <color name="card_header_background">#4DF8EDED</color>
+    <color name="card_background">#80000000</color>
+
+    <color name="battery_gauge_bg">#4DF8EDED</color>
+
+    <!-- Common colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="gray">#888888</color>
+    <color name="dark_blue">#1A237E</color>
+    <color name="transparent">#00000000</color>
+
+    <!-- Custom colors -->
+    <color name="button_background">#4DF8EDED</color> <!-- #F8EDED with 30% opacity -->
+    <color name="background_light">#4DF8EDED</color>
+    <color name="water">#CC0A97EF</color>
+    <color name="button_selected">#FF8800</color>
+    
+    <!-- Text colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_tertiary">#9E9E9E</color>
+    <color name="divider">#BDBDBD</color>
+    <color name="card_container">#FFFFFF</color>
+    <color name="green">#75E43A</color>
+
+</resources>

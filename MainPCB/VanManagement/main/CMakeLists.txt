@@ -1,15 +1,14 @@
-idf_component_register(SRCS "sensor_manager.c"
-                                "heater_manager.c" 
-                                "uart_multiplexer.c" 
-                                "communication_protocol.c"
-                                "main.c"
-                                "communication_manager.c"
-                                "mppt_manager.c"
-                                "led_manager.c"
-                                "usb_manager.c"
-                                "ble_manager_nimble.c"
-                                "fan_manager.c"
-                                "w5500_ethernet.c"
-                                "protocol.c"
-                        INCLUDE_DIRS "."
-                        REQUIRES freertos driver esp_timer esp_adc nvs_flash bt esp_wifi usb esp_netif esp_eth esp_http_client json)
+idf_component_register(SRCS 
+                        "main.c"
+                        "global_coordinator.c"
+                        
+                        INCLUDE_DIRS
+                        "."
+
+                        REQUIRES 
+                        "common_includes"
+                        "communications"
+                        "peripherals_devices"
+                        "utils"
+                        
+)

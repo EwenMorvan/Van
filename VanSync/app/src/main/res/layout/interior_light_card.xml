@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/card_side_margin"
+    android:layout_marginBottom="@dimen/card_side_margin"
+    android:layout_marginStart="@dimen/card_side_margin"
+    android:layout_marginEnd="@dimen/card_side_margin"
+    android:background="@drawable/card_container">
+
+    <!-- Header avec titre centré -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/card_header">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Interior Lights"
+            android:textSize="@dimen/text_size_xlarge"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:padding="@dimen/padding_medium" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Lights modes Content -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/interior_lights_mode_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/header_layout"
+        app:layout_constraintStart_toStartOf="@id/header_layout"
+        app:layout_constraintEnd_toEndOf="@id/header_layout">
+        <TextView
+            android:id="@+id/interior_light_title1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Preset Modes"
+            android:textSize="@dimen/text_size_large"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/margin_large"
+            android:layout_marginStart="@dimen/margin_xxlarge"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+        <!-- Underline -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/interior_underline1"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/card_stroke"
+            android:background="@drawable/spacer_line"
+            android:layout_marginEnd="@dimen/margin_xxlarge"
+            app:layout_constraintTop_toBottomOf="@id/interior_light_title1"
+            app:layout_constraintStart_toStartOf="@id/interior_light_title1"
+            app:layout_constraintEnd_toEndOf="parent"/>
+        <!-- Left layout  -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/interior_left_light_modes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/interior_underline1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintBottom_toBottomOf="parent">
+            <!-- Contenu de la partie gauche -->
+
+            <include
+                android:id="@+id/lightMode1Button"
+                layout="@layout/light_mode_button"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/card_button_large"
+                android:layout_marginTop="@dimen/margin_xlarge"
+                android:layout_marginStart="@dimen/margin_xlarge"
+                android:layout_marginEnd="@dimen/margin_xlarge"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+            <include
+                android:id="@+id/lightMode3Button"
+                layout="@layout/light_mode_button"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/card_button_large"
+                android:layout_marginTop="@dimen/margin_xlarge"
+                android:layout_marginStart="@dimen/margin_xlarge"
+                android:layout_marginEnd="@dimen/margin_xlarge"
+                app:layout_constraintTop_toBottomOf="@id/lightMode1Button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+            <include
+                android:id="@+id/lightMode5Button"
+                layout="@layout/light_mode_button"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/card_button_large"
+                android:layout_marginTop="@dimen/margin_xlarge"
+                android:layout_marginStart="@dimen/margin_xlarge"
+                android:layout_marginEnd="@dimen/margin_xlarge"
+                app:layout_constraintTop_toBottomOf="@id/lightMode3Button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Right layout -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/interior_right_light_modes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/interior_underline1"
+            app:layout_constraintStart_toStartOf="@+id/guideline"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+            <!-- Contenu de la partie droite -->
+
+            <include
+                android:id="@+id/lightMode2Button"
+                layout="@layout/light_mode_button"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/card_button_large"
+                android:layout_marginTop="@dimen/margin_xlarge"
+                android:layout_marginStart="@dimen/margin_xlarge"
+                android:layout_marginEnd="@dimen/margin_xlarge"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+            <include
+                android:id="@+id/lightMode4Button"
+                layout="@layout/light_mode_button"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/card_button_large"
+                android:layout_marginTop="@dimen/margin_xlarge"
+                android:layout_marginStart="@dimen/margin_xlarge"
+                android:layout_marginEnd="@dimen/margin_xlarge"
+                app:layout_constraintTop_toBottomOf="@id/lightMode2Button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+            <include
+                android:id="@+id/lightMode6Button"
+                layout="@layout/light_mode_button"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/card_button_large"
+                android:layout_marginTop="@dimen/margin_xlarge"
+                android:layout_marginStart="@dimen/margin_xlarge"
+                android:layout_marginEnd="@dimen/margin_xlarge"
+                app:layout_constraintTop_toBottomOf="@id/lightMode4Button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/interior_light_spacer"
+                android:layout_width="@dimen/card_separator_small"
+                android:layout_height="0dp"
+                android:background="@drawable/spacer_line"
+                app:layout_constraintTop_toTopOf="@id/lightMode2Button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/lightMode6Button"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Guideline à 50% pour séparer les deux colonnes -->
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Lights modes Edit Button -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/interior_light_edit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/card_button_medium"
+        android:background="@drawable/light_mode_button_bg"
+        android:layout_marginTop="@dimen/margin_large"
+        app:layout_constraintTop_toBottomOf="@id/interior_lights_mode_layout"
+        app:layout_constraintStart_toStartOf="@id/header_layout"
+        app:layout_constraintEnd_toEndOf="@id/header_layout">
+
+        <TextView
+            android:id="@+id/edit_interior_light_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Manage Modes"
+            android:textSize="@dimen/text_size_large"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:paddingTop="@dimen/padding_small"
+            android:paddingBottom="@dimen/padding_small"
+            android:paddingStart="@dimen/padding_xlarge"
+            android:paddingEnd="@dimen/padding_xlarge"
+
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <!-- Lights modes Brightness -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/interior_light_brightness_content_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/interior_light_edit_button"
+        app:layout_constraintStart_toStartOf="@id/header_layout"
+        app:layout_constraintEnd_toEndOf="@id/header_layout"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/interior_light_title2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text=" ☀ Brightness"
+            android:textSize="@dimen/text_size_large"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_marginStart="@dimen/margin_xxlarge"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+        <!-- Underline -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/interior_underline2"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/card_stroke"
+            android:background="@drawable/spacer_line"
+            android:layout_marginEnd="@dimen/margin_xxlarge"
+            app:layout_constraintTop_toBottomOf="@id/interior_light_title2"
+            app:layout_constraintStart_toStartOf="@id/interior_light_title2"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/interior_light_brightness_gauge_bg"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/card_button_medium"
+            android:layout_marginHorizontal="@dimen/margin_xxlarge"
+            android:layout_marginVertical="@dimen/margin_xlarge"
+            android:background="@drawable/light_mode_button_bg"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/interior_underline2"
+            app:layout_constraintStart_toStartOf="@id/interior_underline2"
+            app:layout_constraintTop_toBottomOf="@id/interior_underline2">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/interior_light_brightness_gauge"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/brightness_level"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.58" />
+
+            <TextView
+                android:id="@+id/interior_light_brightness_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_medium"
+                android:text=" 50%"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_large"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

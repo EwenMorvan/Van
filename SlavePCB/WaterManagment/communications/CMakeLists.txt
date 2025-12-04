@@ -1,0 +1,16 @@
+idf_component_register(
+    SRCS 
+        "ethernet/ethernet_manager.c"
+        "i2c/i2c_manager.c"
+        "uart/uart_manager.c"
+        "communications_manager.c"
+    INCLUDE_DIRS 
+        "."
+    REQUIRES
+        "freertos"
+        "driver"
+        "esp_eth"
+        "esp_netif"
+        "esp_timer"
+        "lwip"
+)

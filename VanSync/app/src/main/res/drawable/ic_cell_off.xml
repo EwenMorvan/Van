@@ -1,0 +1,38 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:width="24dp" 
+    android:height="24dp" 
+    android:viewportWidth="960" 
+    android:viewportHeight="960" 
+    android:autoMirrored="true">
+    
+    <!-- Barre 1 (gauche) - GRIS DISABLED -->
+    <path 
+        android:fillColor="#60FFFFFF" 
+        android:pathData="M70,600 Q70,550 120,550 L140,550 Q190,550 190,600 L190,760 Q190,810 140,810 L120,810 Q70,810 70,760 Z"/>
+    
+    <!-- Barre 2 (milieu-gauche) - GRIS DISABLED -->
+    <path 
+        android:fillColor="#60FFFFFF" 
+        android:pathData="M260,520 Q260,470 310,470 L330,470 Q380,470 380,520 L380,760 Q380,810 330,810 L310,810 Q260,810 260,760 Z"/>
+    
+    <!-- Barre 3 (milieu) - GRIS DISABLED -->
+    <path 
+        android:fillColor="#60FFFFFF" 
+        android:pathData="M450,420 Q450,370 500,370 L520,370 Q570,370 570,420 L570,760 Q570,810 520,810 L500,810 Q450,810 450,760 Z"/>
+    
+    <!-- Barre 4 (milieu-droite) - GRIS DISABLED -->
+    <path 
+        android:fillColor="#60FFFFFF" 
+        android:pathData="M640,320 Q640,270 690,270 L710,270 Q760,270 760,320 L760,760 Q760,810 710,810 L690,810 Q640,810 640,760 Z"/>
+    
+    <!-- Barre 5 (droite) - GRIS DISABLED -->
+    <path 
+        android:fillColor="#60FFFFFF" 
+        android:pathData="M830,200 Q830,150 880,150 L900,150 Q950,150 950,200 L950,760 Q950,810 900,810 L880,810 Q830,810 830,760 Z"/>
+    
+    <!-- Ligne diagonale (slash) - BLANC -->
+    <path 
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M80,200 Q60,180 80,160 L140,100 Q160,80 180,100 L900,820 Q920,840 900,860 L840,920 Q820,940 800,920 Z"/>
+    
+</vector>

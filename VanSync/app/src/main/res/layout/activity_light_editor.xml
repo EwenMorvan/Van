@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+    <!-- Header -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/card_header">
+
+        <!-- Bouton retour -->
+        <TextView
+            android:id="@+id/back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="←"
+            android:textSize="28sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:paddingStart="@dimen/padding_xxlarge"
+            android:paddingEnd="@dimen/padding_xlarge"
+            android:paddingTop="@dimen/padding_medium"
+            android:paddingBottom="@dimen/padding_large"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="@dimen/padding_medium"
+            android:text="Light Editor"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_xlarge"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Content ScrollView -->
+    <ScrollView
+        android:id="@+id/content_scrollview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/header_layout"
+        app:layout_constraintBottom_toTopOf="@id/footer_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_xxlarge">
+
+            <!-- Card pour le nom du mode -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/mode_name_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_container"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="@dimen/margin_large">
+
+                <TextView
+                    android:id="@+id/mode_name_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1. Mode Name"
+                    android:textSize="@dimen/text_size_large"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:layout_marginStart="@dimen/margin_xxlarge"
+                    android:layout_marginTop="@dimen/margin_large"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <EditText
+                    android:id="@+id/mode_name_input"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter mode name"
+                    android:textSize="@dimen/text_size_large"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/gray"
+                    android:background="@drawable/light_mode_button_bg"
+                    android:padding="@dimen/padding_large"
+                    android:layout_marginStart="@dimen/margin_xxlarge"
+                    android:layout_marginEnd="@dimen/margin_xxlarge"
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:layout_marginBottom="@dimen/margin_large"
+                    app:layout_constraintTop_toBottomOf="@id/mode_name_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- Card pour la definition de la couleur du strip -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/mode_strip_color_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_container"
+                app:layout_constraintTop_toBottomOf="@+id/mode_name_card"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="@dimen/margin_large">
+
+                <TextView
+                    android:id="@+id/mode_strip_color_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2. Set LEDs Strip Colors"
+                    android:textSize="@dimen/text_size_large"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:layout_marginStart="@dimen/margin_xxlarge"
+                    android:layout_marginTop="@dimen/margin_large"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <!-- Conteneur pour les strips LED (max 2) -->
+                <LinearLayout
+                    android:id="@+id/strips_container"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="@dimen/margin_medium"
+                    app:layout_constraintTop_toBottomOf="@id/mode_strip_color_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <!-- Les strips seront ajoutés dynamiquement ici -->
+
+                </LinearLayout>
+
+                <!-- Bouton Add Strip -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/add_strip_button"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/card_button_large"
+                    android:layout_marginStart="@dimen/margin_xxlarge"
+                    android:layout_marginEnd="@dimen/margin_xxlarge"
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:layout_marginBottom="@dimen/margin_large"
+                    android:background="@drawable/light_mode_button_bg"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/strips_container"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <TextView
+                        android:id="@+id/add_strip_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="➕ Add Strip"
+                        android:textSize="@dimen/text_size_large"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- Card pour la definition de l'animation du strip -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/mode_strip_animation_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_container"
+                app:layout_constraintTop_toBottomOf="@+id/mode_strip_color_card"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="@dimen/margin_large">
+
+                <TextView
+                    android:id="@+id/mode_strip_animation_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3. LEDs Strip Animations"
+                    android:textSize="@dimen/text_size_large"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:layout_marginStart="@dimen/margin_xxlarge"
+                    android:layout_marginTop="@dimen/margin_large"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+                <!-- All led animation setup details-->
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- Card pour l'assignation du mode -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/mode_number_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_container"
+                app:layout_constraintTop_toBottomOf="@+id/mode_strip_animation_card"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="@dimen/margin_large">
+
+                <!-- Header avec titre et bouton help -->
+                <TextView
+                    android:id="@+id/mode_number_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4. Assignment"
+                    android:textSize="@dimen/text_size_large"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:layout_marginStart="@dimen/margin_xxlarge"
+                    android:layout_marginTop="@dimen/margin_large"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <!-- Bouton help -->
+                <TextView
+                    android:id="@+id/help_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="\?"
+                    android:textSize="@dimen/text_size_large"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:background="@drawable/light_mode_button_bg"
+                    android:paddingStart="@dimen/padding_medium"
+                    android:paddingEnd="@dimen/padding_medium"
+                    android:paddingTop="@dimen/padding_small"
+                    android:paddingBottom="@dimen/padding_small"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:layout_constraintStart_toEndOf="@id/mode_number_label"
+                    app:layout_constraintTop_toTopOf="@id/mode_number_label"
+                    app:layout_constraintBottom_toBottomOf="@id/mode_number_label" />
+
+                <!-- Description (initialement cachée) -->
+                <TextView
+                    android:id="@+id/mode_number_description"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Physical Switch:\n• 1 click = Mode at position 1 (OFF)\n• 2 clicks = Mode at position 2\n• 3 clicks = Mode at position 3\n• ... up to 6 clicks = Mode at position 6\n\nPosition 1 is reserved for OFF mode.\n\nModes 7-20 are saved in the app only and can be assigned to positions 2-6 to be controlled via the physical switch.\n\nVirtual modes are app-only and not accessible via the physical switch."
+                    android:textSize="@dimen/text_size_medium"
+                    android:textColor="@color/gray"
+                    android:lineSpacingMultiplier="1.2"
+                    android:layout_marginStart="@dimen/margin_xxlarge"
+                    android:layout_marginEnd="@dimen/margin_xxlarge"
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/mode_number_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <!-- Guideline au centre pour la ligne verticale -->
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/center_guideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.5" />
+
+                <!-- Ligne verticale au centre -->
+                <View
+                    android:id="@+id/center_separator"
+                    android:layout_width="@dimen/card_separator_small"
+                    android:layout_height="0dp"
+                    android:background="@drawable/spacer_line"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:layout_marginBottom="@dimen/margin_large"
+                    app:layout_constraintTop_toBottomOf="@id/mode_number_description"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/center_guideline"
+                    app:layout_constraintEnd_toEndOf="@id/center_guideline" />
+
+                <!-- Colonne GAUCHE - Physical Switch -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/physical_switch_column"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_xxlarge"
+                    android:layout_marginEnd="@dimen/margin_medium"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:layout_marginBottom="@dimen/margin_large"
+                    app:layout_constraintTop_toBottomOf="@id/mode_number_description"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/center_separator">
+
+                    <!-- Bouton Physical Switch -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/physical_switch_button"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/card_button_medium"
+                        android:background="@drawable/light_mode_button_bg_selectable"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent">
+
+                        <TextView
+                            android:id="@+id/physical_switch_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Physical Switch"
+                            android:textSize="@dimen/text_size_large"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <!-- Label Switch Position -->
+                    <TextView
+                        android:id="@+id/mode_position_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Switch Position:"
+                        android:textSize="@dimen/text_size_large"
+                        android:textColor="@color/white"
+                        android:layout_marginTop="@dimen/margin_large"
+                        app:layout_constraintTop_toBottomOf="@id/physical_switch_button"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <!-- Spinner Physical Switch -->
+                    <Spinner
+                        android:id="@+id/mode_number_spinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_medium"
+                        android:background="@drawable/light_mode_button_bg"
+                        android:padding="@dimen/padding_small"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/mode_position_label" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- Colonne DROITE - Virtual -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/virtual_column"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:layout_marginEnd="@dimen/margin_xxlarge"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:layout_marginBottom="@dimen/margin_large"
+                    app:layout_constraintTop_toBottomOf="@id/mode_number_description"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/center_separator"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <!-- Bouton Virtual -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/virtual_button"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/card_button_medium"
+                        android:background="@drawable/light_mode_button_bg_selectable"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent">
+
+                        <TextView
+                            android:id="@+id/virtual_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Virtual"
+                            android:textSize="@dimen/text_size_large"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <!-- Label Virtual Position -->
+                    <TextView
+                        android:id="@+id/virtual_position_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Virtual Position:"
+                        android:textSize="@dimen/text_size_large"
+                        android:textColor="@color/white"
+                        android:layout_marginTop="@dimen/margin_large"
+                        app:layout_constraintTop_toBottomOf="@id/virtual_button"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <!-- Spinner Virtual -->
+                    <Spinner
+                        android:id="@+id/virtual_number_spinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_medium"
+                        android:background="@drawable/light_mode_button_bg"
+                        android:padding="@dimen/padding_small"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/virtual_position_label" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+    <!-- Footer avec boutons Save et Cancel -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/footer_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_large"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Bouton Cancel -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cancel_button"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/card_button_large"
+            android:layout_marginEnd="@dimen/margin_medium"
+            android:background="@drawable/light_mode_button_bg"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/save_button"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancel"
+                android:textSize="@dimen/text_size_xlarge"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Bouton Save -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/save_button"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/card_button_large"
+            android:layout_marginStart="@dimen/margin_medium"
+            android:background="@drawable/light_mode_button_bg"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintStart_toEndOf="@id/cancel_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save"
+                android:textSize="@dimen/text_size_xlarge"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

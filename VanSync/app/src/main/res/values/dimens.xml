@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Text sizes -->
+    <dimen name="text_size_small">10sp</dimen>
+    <dimen name="text_size_medium">12sp</dimen>
+    <dimen name="text_size_large">14sp</dimen>
+    <dimen name="text_size_xlarge">18sp</dimen>
+    <dimen name="text_size_xxlarge">24sp</dimen>
+
+    
+    <!-- Margins and padding -->
+    <dimen name="margin_small">2dp</dimen>
+    <dimen name="margin_medium">5dp</dimen>
+    <dimen name="margin_large">12dp</dimen>
+    <dimen name="margin_xlarge">14dp</dimen>
+    <dimen name="margin_xxlarge">20dp</dimen>
+
+    
+    <dimen name="padding_small">2dp</dimen>
+    <dimen name="padding_medium">5dp</dimen>
+    <dimen name="padding_large">12dp</dimen>
+    <dimen name="padding_xlarge">14dp</dimen>
+    <dimen name="padding_xxlarge">20dp</dimen>
+
+    <!-- Button dimensions -->
+    <dimen name="button_height">48dp</dimen>
+    <dimen name="button_min_width">64dp</dimen>
+    
+    <!-- Icon sizes -->
+    <dimen name="icon_size_small">16dp</dimen>
+    <dimen name="icon_size_medium">24dp</dimen>
+    <dimen name="icon_size_large">32dp</dimen>
+    
+    <!-- Seekbar and progress -->
+    <dimen name="seekbar_height">20dp</dimen>
+    <dimen name="progress_size">24dp</dimen>
+    
+    <!-- Layout specific -->
+    <dimen name="section_spacing">16dp</dimen>
+    <dimen name="item_spacing">8dp</dimen>
+
+    <!-- Button_tab -->
+    <dimen name="tab_button_stroke">2dp</dimen>
+    <dimen name="tab_button_stroke_selected">3dp</dimen>
+    <dimen name="tab_button_padding">10dp</dimen>
+    <dimen name="tab_button_padding_bottom">15dp</dimen>
+
+    <!-- Card -->
+    <dimen name="card_stroke">2dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="card_corner_radius">20dp</dimen>
+    <dimen name="card_side_margin">20dp</dimen>
+
+    <dimen name="card_button_large">35dp</dimen>
+    <dimen name="card_button_medium">25dp</dimen>
+    <dimen name="card_separator_small">1dp</dimen>
+
+
+
+
+    <dimen name="battery_gauge_bg_stroke">10dp</dimen>
+    <dimen name="water_tank_radius">10dp</dimen>
+
+    <dimen name="strip_setup_height">30dp</dimen>
+    <dimen name="zoom_btn">25dp</dimen>
+    <dimen name="zoom_btn_txt">15dp</dimen>
+
+    <dimen name="cell_height">80dp</dimen>
+    <dimen name="cell_width">40dp</dimen>
+
+
+
+
+</resources>

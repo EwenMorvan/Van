@@ -1,0 +1,70 @@
+menu "Video Projector Configuration"
+
+    orsource "$IDF_PATH/examples/common_components/env_caps/$IDF_TARGET/Kconfig.env_caps"
+
+    menu "Motor DC"
+        config MOTOR_TURNS_COMPLETE_TRAVEL
+            int "Encoder turns for complete travel (x100)"
+            default 1000
+            range 10 10000
+            help
+                Number of encoder turns needed for complete travel (x100).
+                Example: 10.0 turns = 1000 (divide by 100 in code)
+
+        config MOTOR_GEAR_RATIO
+            int "Motor gear ratio (x10)"
+            default 1000
+            range 10 10000
+            help
+                Gear reduction ratio of motor (x10).
+                Example: 100.0 = 1000 (divide by 10 in code)
+    endmenu
+
+    menu "BLE Parameters"
+        config BLE_DEVICE_NAME
+            string "BLE device name"
+            default "VideoProjector_Van"
+            help
+                Name visible during BLE discovery (max 31 chars).
+
+        config BLE_BROADCAST_INTERVAL
+            int "BLE advertising interval (ms)"
+            default 500
+            range 100 10000
+            help
+                Advertising interval in milliseconds.
+    endmenu
+
+    menu "Button and LED"
+        config BUTTON_DEBOUNCE_MS
+            int "Button debounce time (ms)"
+            default 50
+            range 10 200
+            help
+                Wait time to confirm button press.
+
+        config BUTTON_LONG_PRESS_MS
+            int "Long press duration (ms)"
+            default 1000
+            range 500 5000
+            help
+                Minimum duration to consider as long press.
+    endmenu
+
+    menu "IR LED"
+        config IR_FREQUENCY_HZ
+            int "IR carrier frequency (Hz)"
+            default 38000
+            range 1000 56000
+            help
+                Standard carrier frequency is 38000 Hz.
+
+        config IR_DUTY_CYCLE
+            int "IR PWM duty cycle (%)"
+            default 50
+            range 10 90
+            help
+                PWM duty cycle for IR LED signal.
+    endmenu
+
+endmenu

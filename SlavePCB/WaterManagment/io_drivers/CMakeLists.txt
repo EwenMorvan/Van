@@ -1,0 +1,13 @@
+idf_component_register(
+    SRCS 
+        "shift_register.c"
+        "gpio_manager.c"
+        "current_sensor.c"
+    INCLUDE_DIRS 
+        "."
+    REQUIRES 
+        "common_includes"
+        "communications"
+        "freertos"
+        "driver"
+)

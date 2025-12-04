@@ -1,4 +1,5 @@
 env/
 .vscode/
 *.bin
-VanSync/
+HTCO2/env
+svg_logo

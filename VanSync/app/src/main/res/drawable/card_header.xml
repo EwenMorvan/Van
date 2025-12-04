@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fond principal avec tous les coins arrondis -->
+    <!-- Header avec seulement les coins du haut arrondis -->
+    <item
+        android:bottom="0dp"
+        android:top="0dp"
+        android:left="0dp"
+        android:right="0dp"
+        android:height="50dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/card_header_background"/>
+            <corners
+                android:topLeftRadius="@dimen/card_corner_radius"
+                android:topRightRadius="@dimen/card_corner_radius"
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp"/>
+            <stroke
+                android:color="@color/white"
+                android:width="@dimen/card_stroke"/>
+        </shape>
+    </item>
+</selector>

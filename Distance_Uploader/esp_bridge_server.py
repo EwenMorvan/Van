@@ -8,6 +8,8 @@ import sys
 import os
 import cv2  # Ajout pour la webcam
 import numpy as np
+import asyncio
+import websockets
 
 # ----------------------------
 # CONFIGURATION
@@ -277,7 +279,7 @@ def handle_client(conn, addr):
                     target = "MainPCB"
                 else:
                     # Pour SlavePCB: BE1_CLICK, etc.
-                    for btn in ["BE1", "BE2", "BD1", "BD2", "BH"]:
+                    for btn in ["BE1", "BE2", "BD1", "BD2", "BH","BV1", "BV2"]:
                         if cmd == f"{btn}_CLICK":
                             target = "SlavePCB"
                             break
@@ -296,6 +298,31 @@ def handle_client(conn, addr):
             clients.remove(conn)
         conn.close()
         print("[-] Client déconnecté")
+
+# --- Serveur WebSocket pour le flux vidéo ---
+async def video_stream(websocket, path):
+    cap = cv2.VideoCapture(0)
+    try:
+        while running:
+            ret, frame = cap.read()
+            if not ret:
+                await asyncio.sleep(0.05)
+                continue
+            _, img_encoded = cv2.imencode('.jpg', frame)
+            img_bytes = img_encoded.tobytes()
+            await websocket.send(img_bytes)
+            await asyncio.sleep(0.03)  # ~30 fps
+    finally:
+        cap.release()
+
+def start_websocket_server():
+    async def run_server():
+        async with websockets.serve(video_stream, "0.0.0.0", 8765):
+            await asyncio.Future()  # run forever
+    asyncio.run(run_server())
+
+# Démarrer le serveur WebSocket dans un thread séparé
+threading.Thread(target=start_websocket_server, daemon=True).start()
 
 # ----------------------------
 # SERVEUR TCP PRINCIPAL

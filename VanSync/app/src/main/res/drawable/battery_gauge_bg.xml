@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/transparent"/>
+            <stroke
+                android:color="@color/battery_gauge_bg"
+                android:width="@dimen/battery_gauge_bg_stroke"
+                />
+        </shape>
+    </item>
+</selector>

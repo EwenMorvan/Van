@@ -1,0 +1,24 @@
+idf_component_register(
+    SRCS 
+        "ethernet/ethernet_manager.c"
+        "uart/uart_multiplexer.c"
+        "slave_main_communication_manager.c"
+        "app_main_communication_manager.c"
+        "ble/ble_manager_nimble.c"
+        "ble/fragment_handler.c"
+        "protocol.c"
+        "command_parser.c"
+
+    INCLUDE_DIRS 
+        "."
+    REQUIRES
+        "freertos"
+        "driver"
+        "esp_eth"
+        "esp_netif"
+        "esp_timer"
+        "lwip"
+        "nvs_flash"
+        "bt"
+        "json"
+)
