@@ -16,12 +16,12 @@ public class VanState {
     }
 
     public enum ProjectorState {
-        PROJECTOR_STATE_UNKNOWN(0),
-        PROJECTOR_STATE_RETRACTED(1),
-        PROJECTOR_STATE_RETRACTING(2),
-        PROJECTOR_STATE_DEPLOYED(3),
-        PROJECTOR_STATE_DEPLOYING(4);
-        
+        PROJECTOR_STATE_RETRACTED(0),
+        PROJECTOR_STATE_DEPLOYING(1),
+        PROJECTOR_STATE_DEPLOYED(2),
+        PROJECTOR_STATE_RETRACTING(3),
+        PROJECTOR_STATE_STOPPED(4);
+
         private final int value;
         ProjectorState(int value) { this.value = value; }
         public int getValue() { return value; }
@@ -30,7 +30,7 @@ public class VanState {
             for (ProjectorState state : ProjectorState.values()) {
                 if (state.value == value) return state;
             }
-            return PROJECTOR_STATE_UNKNOWN;
+            return PROJECTOR_STATE_STOPPED;
         }
     }
 
@@ -155,6 +155,7 @@ public class VanState {
         public float exterior_temperature;
         public float humidity;
         public int co2_level;
+        public int light;
         public boolean door_open;
 
         public SensorData() {}
@@ -245,11 +246,13 @@ public class VanState {
         public ProjectorState state;        // État du vidéoprojecteur (Retracted/Deploying/Deployed/Retracting)
         public boolean connected;           // Connecté via BLE
         public long last_update_time;       // Timestamp de la dernière mise à jour
+        public float position_percent;      // Position actuelle en pourcentage (0% = replié, 100% = déployé)
 
         public ProjectorData() {
-            state = ProjectorState.PROJECTOR_STATE_UNKNOWN;
+            state = ProjectorState.PROJECTOR_STATE_STOPPED;
             connected = false;
             last_update_time = 0;
+            position_percent = 0.0f;
         }
     }
 

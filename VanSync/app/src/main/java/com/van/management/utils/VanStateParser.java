@@ -88,5 +88,23 @@ public class VanStateParser {
             }
             vanState.slave_pcb = slave;
         }
+        if (root.has("videoprojecteur")) {
+            JsonObject projectorObj = root.getAsJsonObject("videoprojecteur");
+            VanState.ProjectorData projector = new VanState.ProjectorData();
+            if (projectorObj.has("state")) {
+                int stateValue = projectorObj.get("state").getAsInt();
+                projector.state = VanState.ProjectorState.fromValue(stateValue);
+            }
+            if (projectorObj.has("connected")) {
+                projector.connected = projectorObj.get("connected").getAsBoolean();
+            }
+            if (projectorObj.has("last_update_time")) {
+                projector.last_update_time = projectorObj.get("last_update_time").getAsLong();
+            }
+            if (projectorObj.has("position_percent")) {
+                projector.position_percent = projectorObj.get("position_percent").getAsFloat();
+            }
+            vanState.projector = projector;
+        }
     }
 }

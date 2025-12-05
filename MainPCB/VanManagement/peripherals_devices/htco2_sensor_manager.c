@@ -1,17 +1,10 @@
 #include "htco2_sensor_manager.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_log.h"
-#include "driver/uart.h"
-#include <inttypes.h>
-
-#include "../communications/protocol.h"
-#include "../communications/uart/uart_multiplexer.h"
-#include "../common_includes/gpio_pinout.h"
 
 static const char *TAG = "HTCO2_MGR";
 
 static TaskHandle_t htco2_task_handle = NULL;
+
+htco2_sensor_t htco2_data = {0};
 
 // Buffer to accumulate a line
 static char line_buf[256];
@@ -52,13 +45,12 @@ static void htco2_task(void *pv) {
 
                         int parsed = sscanf(line_buf, "%" SCNu32 ",%" SCNd32 ",%" SCNd32 ",%" SCNd32, &co2, &t_tenths, &h_tenths, &light);
                         if (parsed >= 3) {
-                            van_state_t *state = protocol_get_van_state();
-                            if (state) {
-                                state->sensors.co2_level = (uint16_t)co2;
-                                state->sensors.cabin_temperature = ((float)t_tenths) / 10.0f;
-                                state->sensors.humidity = ((float)h_tenths) / 10.0f;
-                                ESP_LOGI(TAG, "Parsed HCO2T: CO2=%" PRIu32 " ppm, T=%.1f°C, RH=%.1f%%, light=%" PRId32, co2, state->sensors.cabin_temperature, state->sensors.humidity, light);
-                            }
+                            htco2_data.co2 = co2;
+                            htco2_data.t_tenths = t_tenths;
+                            htco2_data.h_tenths = h_tenths;
+                            htco2_data.light = light;
+                            ESP_LOGD(TAG, "Parsed HCO2T: CO2=%" PRIu32 " ppm, T=%.1f°C, RH=%.1f%%, light=%" PRId32, co2, ((float)t_tenths) / 10.0f, ((float)h_tenths) / 10.0f, light);
+                            
                         } else {
                             ESP_LOGW(TAG, "Failed to parse HCO2T line: '%s' (parsed=%d)", line_buf, parsed);
                         }
@@ -103,7 +95,12 @@ esp_err_t htco2_sensor_manager_deinit(void) {
     return ESP_OK;
 }
 
-esp_err_t htco2_sensor_manager_update_van_state(void) {
-    // The task updates state periodically; provide a manual hook if needed.
+esp_err_t htco2_sensor_manager_update_van_state(van_state_t* van_state) {
+
+    van_state->sensors.co2_level = (uint16_t)htco2_data.co2;
+    van_state->sensors.cabin_temperature = ((float)htco2_data.t_tenths) / 10.0f;
+    van_state->sensors.humidity = ((float)htco2_data.h_tenths) / 10.0f;
+    van_state->sensors.light = (uint16_t)htco2_data.light;
+    
     return ESP_OK;
 }

@@ -71,6 +71,12 @@ typedef struct {
     uint8_t jbd_buffer[64];
     size_t jbd_buffer_len;
     uint32_t jbd_last_fragment_time;
+    // Flag set when service 0xff00 (JBD BMS) is detected for this device
+    bool is_jbd_service;
+    // Videoprojector specific handles (service 0x181A)
+    bool is_projector;
+    uint16_t proj_control_handle; // 0x2A58 write
+    uint16_t proj_status_handle;  // 0x2A19 read/notify
 } external_device_t;
 
 // ============================================================================
@@ -417,6 +423,16 @@ static int on_characteristic_discovered(uint16_t conn_handle,
                 // TX characteristic (commands to BMS)
                 dev->jbd_tx_handle = chr->val_handle;
                 ESP_LOGI(TAG, "🔋 Found JBD TX characteristic (0xFF02) at handle=%d", chr->val_handle);
+            } else if (uuid16 == 0x2A58) {
+                // Video projector control characteristic (write)
+                dev->is_projector = true;
+                dev->proj_control_handle = chr->val_handle;
+                ESP_LOGI(TAG, "📽️ Found Projector CONTROL char (0x2A58) at handle=%d", chr->val_handle);
+            } else if (uuid16 == 0x2A19) {
+                // Video projector status characteristic (read/notify)
+                dev->is_projector = true;
+                dev->proj_status_handle = chr->val_handle;
+                ESP_LOGI(TAG, "📽️ Found Projector STATUS char (0x2A19) at handle=%d", chr->val_handle);
             }
         }
         
@@ -482,6 +498,26 @@ static int on_characteristic_read(uint16_t conn_handle,
 }
 #endif
 
+// Read callback used for projector (and other simple reads)
+static int on_simple_read(uint16_t conn_handle,
+                          const struct ble_gatt_error *error,
+                          struct ble_gatt_attr *attr,
+                          void *arg) {
+    external_device_t *dev = (external_device_t *)arg;
+    if (error->status == 0 && attr && attr->om) {
+        uint16_t len = attr->om->om_len;
+        if (len > sizeof(dev->received_data)) len = sizeof(dev->received_data);
+        ble_hs_mbuf_to_flat(attr->om, dev->received_data, len, NULL);
+        lock_ble();
+        dev->received_len = len;
+        unlock_ble();
+        ESP_LOGI(TAG, "📥 Read response from %s handle=%d (%d bytes)", dev->device_name, attr->handle, len);
+    } else {
+        ESP_LOGW(TAG, "📥 Read failed or empty (status=%d)", error->status);
+    }
+    return 0;
+}
+
 // Subscribe to all stored characteristics (called after discovery completes)
 static void subscribe_to_characteristics(uint16_t conn_handle, external_device_t *dev) {
     ESP_LOGI(TAG, "🔔 Subscribing to %d notifications and %d indications...", 
@@ -529,27 +565,33 @@ static void subscribe_to_characteristics(uint16_t conn_handle, external_device_t
     
     ESP_LOGI(TAG, "✅ All subscription requests sent");
     
-    // WORKAROUND: JBD BMS doesn't respond to characteristic discovery for service 0xff00
-    // Testing confirmed: Handle 21 = TX (send commands), Handle 16 = RX (receive notifications)
-    ESP_LOGI(TAG, "🔧 Setting up JBD handles for service 0xff00 (handles 15-22)");
-    
-    // Subscribe to handle 16 for notifications (RX from battery)
-    dev->jbd_rx_handle = 16;
-    uint8_t notify_value[2] = {0x01, 0x00};  // Enable notifications
-    int rc = ble_gattc_write_flat(conn_handle, 17, notify_value, sizeof(notify_value), NULL, NULL);  // 17 = CCCD for handle 16
-    if (rc == 0) {
-        ESP_LOGI(TAG, "🔔 Subscribed to notifications on handle 16 (JBD RX)");
+    // If this device exposes the JBD service (0xFF00) then apply the
+    // JBD-specific workaround (static handles for RX/TX). Otherwise skip it.
+    if (dev->is_jbd_service) {
+        // WORKAROUND: JBD BMS doesn't respond to characteristic discovery for service 0xff00
+        // Testing confirmed: Handle 21 = TX (send commands), Handle 16 = RX (receive notifications)
+        ESP_LOGI(TAG, "🔧 Setting up JBD handles for service 0xff00 (handles 15-22)");
+
+        // Subscribe to handle 16 for notifications (RX from battery)
+        dev->jbd_rx_handle = 16;
+        uint8_t notify_value[2] = {0x01, 0x00};  // Enable notifications
+        int rc = ble_gattc_write_flat(conn_handle, 17, notify_value, sizeof(notify_value), NULL, NULL);  // 17 = CCCD for handle 16
+        if (rc == 0) {
+            ESP_LOGI(TAG, "🔔 Subscribed to notifications on handle 16 (JBD RX)");
+        } else {
+            ESP_LOGW(TAG, "⚠️ Failed to subscribe to handle 16: rc=%d", rc);
+        }
+
+        // Set TX handle to 21 (confirmed working from tests)
+        dev->jbd_tx_handle = 21;
+        dev->jbd_ready = true;
+        dev->jbd_buffer_len = 0;  // Initialize reassembly buffer
+        ESP_LOGI(TAG, "🔋 JBD RX handle: %d (notifications)", dev->jbd_rx_handle);
+        ESP_LOGI(TAG, "🔋 JBD TX handle: %d (commands) ✅ CONFIRMED", dev->jbd_tx_handle);
+        ESP_LOGI(TAG, "🔋 Battery data available on handle 16 (use ble_request_battery_update to poll)");
     } else {
-        ESP_LOGW(TAG, "⚠️ Failed to subscribe to handle 16: rc=%d", rc);
+        ESP_LOGI(TAG, "🔎 No JBD service detected for %s — skipping JBD workaround", dev->device_name);
     }
-    
-    // Set TX handle to 21 (confirmed working from tests)
-    dev->jbd_tx_handle = 21;
-    dev->jbd_ready = true;
-    dev->jbd_buffer_len = 0;  // Initialize reassembly buffer
-    ESP_LOGI(TAG, "🔋 JBD RX handle: %d (notifications)", dev->jbd_rx_handle);
-    ESP_LOGI(TAG, "🔋 JBD TX handle: %d (commands) ✅ CONFIRMED", dev->jbd_tx_handle);
-    ESP_LOGI(TAG, "� Battery data available on handle 16 (use ble_request_battery_update to poll)");
 }
 
 // Callback for GATT service discovery
@@ -566,6 +608,14 @@ static int on_service_discovered(uint16_t conn_handle,
                  uuid_str, service->start_handle, service->end_handle);
         
         dev->services_discovered++;
+        // Detect JBD service (0xFF00) and mark device accordingly
+        if (service->uuid.u.type == BLE_UUID_TYPE_16) {
+            uint16_t svc_uuid16 = service->uuid.u16.value;
+            if (svc_uuid16 == 0xFF00) {
+                dev->is_jbd_service = true;
+                ESP_LOGI(TAG, "🔎 JBD service (0xFF00) detected for %s", dev->device_name);
+            }
+        }
         
         // Discover all characteristics in this service
         int rc = ble_gattc_disc_all_chrs(conn_handle, service->start_handle, service->end_handle,
@@ -605,8 +655,18 @@ static int external_device_gap_event(struct ble_gap_event *event, void *arg) {
                 dev->services_discovered = 0;
                 unlock_ble();
                 
-                // Request MTU update
-                ble_att_set_preferred_mtu(512);
+                // Request MTU update: 50 bytes for projector (detected by name), 512 for other devices
+                bool is_projector_device = (strstr(dev->device_name, "Projector") != NULL || 
+                                           strstr(dev->device_name, "VideoProjector") != NULL);
+                uint16_t preferred_mtu = is_projector_device ? 50 : 512;
+                ble_att_set_preferred_mtu(preferred_mtu);
+                int rc_mtu = ble_gattc_exchange_mtu(event->connect.conn_handle, NULL, NULL);
+                if (rc_mtu == 0) {
+                    ESP_LOGI(TAG, "📏 MTU exchange initiated (requesting %d bytes for %s)", 
+                             preferred_mtu, is_projector_device ? "projector" : "device");
+                } else {
+                    ESP_LOGW(TAG, "⚠️ MTU exchange failed: rc=%d", rc_mtu);
+                }
                 
                 // Discover all services and subscribe to notifications
                 ESP_LOGI(TAG, "🔍 Starting service discovery...");
@@ -639,9 +699,9 @@ static int external_device_gap_event(struct ble_gap_event *event, void *arg) {
             break;
             
         case BLE_GAP_EVENT_NOTIFY_RX: {
-            // Received notification from external device (JBD BMS responses)
+            // Received notification from external device (JBD BMS responses or others)
             uint16_t len = event->notify_rx.om->om_len;
-            uint8_t fragment[32];
+            uint8_t fragment[50];  // Increased buffer size to handle larger notifications
             
             if (len > sizeof(fragment)) len = sizeof(fragment);
             ble_hs_mbuf_to_flat(event->notify_rx.om, fragment, len, NULL);
@@ -650,28 +710,39 @@ static int external_device_gap_event(struct ble_gap_event *event, void *arg) {
             uint32_t now = xTaskGetTickCount() * portTICK_PERIOD_MS;
             
             // Reset buffer if timeout (fragmentation window expired)
-            if (dev->jbd_buffer_len > 0 && (now - dev->jbd_last_fragment_time) > 1000) {
-                dev->jbd_buffer_len = 0;
-            }
-            
-            // Append fragment to reassembly buffer
-            if (dev->jbd_buffer_len + len <= sizeof(dev->jbd_buffer)) {
-                memcpy(dev->jbd_buffer + dev->jbd_buffer_len, fragment, len);
-                dev->jbd_buffer_len += len;
-                dev->jbd_last_fragment_time = now;
-                
-                // Check if complete JBD response received (DD...77)
-                if (dev->jbd_buffer_len >= 7 && 
-                    dev->jbd_buffer[0] == 0xDD && 
-                    dev->jbd_buffer[dev->jbd_buffer_len - 1] == 0x77) {
-                    
-                    // Copy complete response for parsing
-                    memcpy(dev->received_data, dev->jbd_buffer, dev->jbd_buffer_len);
-                    dev->received_len = dev->jbd_buffer_len;
-                    dev->jbd_buffer_len = 0;  // Reset for next response
+            // If device is JBD, do fragment reassembly; otherwise handle simple notifications
+            if (dev->is_jbd_service) {
+                if (dev->jbd_buffer_len > 0 && (now - dev->jbd_last_fragment_time) > 1000) {
+                    dev->jbd_buffer_len = 0;
+                }
+
+                // Append fragment to reassembly buffer
+                if (dev->jbd_buffer_len + len <= sizeof(dev->jbd_buffer)) {
+                    memcpy(dev->jbd_buffer + dev->jbd_buffer_len, fragment, len);
+                    dev->jbd_buffer_len += len;
+                    dev->jbd_last_fragment_time = now;
+
+                    // Check if complete JBD response received (DD...77)
+                    if (dev->jbd_buffer_len >= 7 && 
+                        dev->jbd_buffer[0] == 0xDD && 
+                        dev->jbd_buffer[dev->jbd_buffer_len - 1] == 0x77) {
+
+                        // Copy complete response for parsing
+                        memcpy(dev->received_data, dev->jbd_buffer, dev->jbd_buffer_len);
+                        dev->received_len = dev->jbd_buffer_len;
+                        dev->jbd_buffer_len = 0;  // Reset for next response
+                    }
+                } else {
+                    dev->jbd_buffer_len = 0;  // Overflow, reset
                 }
             } else {
-                dev->jbd_buffer_len = 0;  // Overflow, reset
+                // Non-JBD device: copy notification payload directly for consumer to read
+                size_t copy_len = len;
+                if (copy_len > sizeof(dev->received_data)) copy_len = sizeof(dev->received_data);
+                memcpy(dev->received_data, fragment, copy_len);
+                dev->received_len = copy_len;
+                dev->jbd_last_fragment_time = now;
+                ESP_LOGI(TAG, "🔔 Notification received from %s: %d bytes", dev->device_name, copy_len);
             }
             unlock_ble();
             break;
@@ -1278,6 +1349,87 @@ esp_err_t ble_request_battery_cells(const uint8_t mac_address[6]) {
         return ESP_FAIL;
     }
     
+    return ESP_OK;
+}
+
+// ============================================================================
+// PROJECTOR APIs
+// ============================================================================
+
+/**
+ * @brief Request projector status by reading the status characteristic (0x2A19)
+ */
+esp_err_t ble_request_projector_status(const uint8_t mac_address[6]) {
+    if (!mac_address) return ESP_ERR_INVALID_ARG;
+
+    lock_ble();
+    external_device_t *dev = find_external_device_by_mac(mac_address);
+    if (!dev || !dev->registered || !dev->connected) {
+        unlock_ble();
+        return ESP_ERR_NOT_FOUND;
+    }
+
+    uint16_t conn_handle = dev->conn_handle;
+    uint16_t status_handle = dev->proj_status_handle;
+    uint16_t control_handle = dev->proj_control_handle;
+    unlock_ble();
+
+    if (control_handle == 0 || status_handle == 0) {
+        ESP_LOGW(TAG, "Projector control or status handle not found for device (ctrl=%d status=%d)",
+                 control_handle, status_handle);
+        return ESP_ERR_NOT_SUPPORTED;
+    }
+
+    // Send PROJECTOR_CMD_GET_STATUS to the control characteristic (0x2A58)
+    esp_err_t err = ble_send_projector_command(mac_address, PROJECTOR_CMD_GET_STATUS);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to send PROJECTOR_CMD_GET_STATUS");
+        return err;
+    }
+
+    // Small delay to allow the device to prepare a response before reading
+    vTaskDelay(pdMS_TO_TICKS(100));
+
+    // Read the status characteristic (0x2A19) — response will be delivered to on_simple_read
+    int rc = ble_gattc_read(conn_handle, status_handle, on_simple_read, dev);
+    if (rc != 0) {
+        ESP_LOGE(TAG, "Failed to start GATT read for projector status: rc=%d", rc);
+        return ESP_FAIL;
+    }
+
+    ESP_LOGD(TAG, "📥 Requested projector status (read handle=%d)", status_handle);
+    return ESP_OK;
+}
+
+/**
+ * @brief Send a projector command (single-byte enum) to control characteristic (0x2A58)
+ */
+esp_err_t ble_send_projector_command(const uint8_t mac_address[6], uint8_t cmd_byte) {
+    if (!mac_address) return ESP_ERR_INVALID_ARG;
+
+    lock_ble();
+    external_device_t *dev = find_external_device_by_mac(mac_address);
+    if (!dev || !dev->registered || !dev->connected) {
+        unlock_ble();
+        return ESP_ERR_NOT_FOUND;
+    }
+
+    uint16_t conn_handle = dev->conn_handle;
+    uint16_t ctrl_handle = dev->proj_control_handle;
+    unlock_ble();
+
+    if (ctrl_handle == 0) {
+        ESP_LOGW(TAG, "Projector control handle not configured for device");
+        return ESP_ERR_NOT_SUPPORTED;
+    }
+
+    int rc = ble_gattc_write_flat(conn_handle, ctrl_handle, &cmd_byte, 1, NULL, NULL);
+    if (rc != 0) {
+        ESP_LOGE(TAG, "Failed to send projector command: rc=%d", rc);
+        return ESP_FAIL;
+    }
+
+    ESP_LOGI(TAG, "📤 Sent projector command 0x%02X to handle %d", cmd_byte, ctrl_handle);
     return ESP_OK;
 }
 

@@ -225,6 +225,8 @@ esp_err_t update_van_state(void) {
         led_manager_update_van_state(van_state);
         // Update video projector data
         videoprojecteur_manager_update_van_state(van_state);
+        // Update HCO2T sensor data
+        htco2_sensor_manager_update_van_state(van_state);
 
         // Finally, print the updated state for debugging
         #if PRINT_DEBUG_VAN_STATE
@@ -337,7 +339,7 @@ void app_main(void) {
             // }
         #endif
         
-        vTaskDelay(pdMS_TO_TICKS(1000));  // Update every 1 second
+        vTaskDelay(pdMS_TO_TICKS(1000));  // Update every 0.5 second
     }
     
  

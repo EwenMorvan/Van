@@ -109,7 +109,6 @@ void button_manager_set_led(bool enabled)
 {
     gpio_set_level(g_pin_led, enabled ? 1 : 0);
     g_led_state = enabled;
-    ESP_LOGI(TAG, "LED %s", enabled ? "allumée" : "éteinte");
 }
 
 bool button_manager_get_led_state(void)

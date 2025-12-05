@@ -166,6 +166,10 @@ typedef enum {
     PROJECTOR_CMD_JOG_DOWN_1 = 7,    // Recule de 1.0 tour (0x07)
     PROJECTOR_CMD_JOG_DOWN_01 = 8,   // Recule de 0.1 tour (0x08)
     PROJECTOR_CMD_JOG_DOWN_001 = 9,  // Recule de 0.01 tour (0x09)
+    PROJECTOR_CMD_JOG_UP_1_FORCED = 10,   // Avance de 1.0 tour (force) (0x0A)
+    PROJECTOR_CMD_JOG_DOWN_1_FORCED = 11, // Recule de 1.0 tour (force) (0x0B)
+    PROJECTOR_CMD_CALIBRATE_UP = 12,    // Calibrage vers le haut (0x0C)
+    PROJECTOR_CMD_CALIBRATE_DOWN = 13,  // Calibrage vers le bas (0x0D)
 } projector_command_t;
 
 typedef struct {
@@ -173,11 +177,11 @@ typedef struct {
 } videoprojecteur_command_t;
 
 typedef enum {
-    PROJECTOR_STATE_UNKNOWN = 0,
-    PROJECTOR_STATE_RETRACTED = 1,
-    PROJECTOR_STATE_RETRACTING = 2,
-    PROJECTOR_STATE_DEPLOYED = 3,
-    PROJECTOR_STATE_DEPLOYING = 4,
+    PROJECTOR_STATE_RETRACTED = 0,
+    PROJECTOR_STATE_DEPLOYING = 1,
+    PROJECTOR_STATE_DEPLOYED = 2,
+    PROJECTOR_STATE_RETRACTING = 3,
+    PROJECTOR_STATE_STOPPED = 4,
 } projector_state_t;
 
 typedef enum {
@@ -333,6 +337,7 @@ typedef struct {
         float exterior_temperature;    // Température extérieure (°C)
         float humidity;                // Humidité relative (%)
         uint16_t co2_level;            // Niveau CO2 (ppm)
+        uint16_t light;                 // Luminosité (valeur brute) between 0 an 1024
         bool door_open;                // Porte ouverte/fermée
     } sensors;
     
@@ -400,8 +405,9 @@ typedef struct {
         projector_state_t state;        // Etat du videoprojecteur (Retracted/Deploying/Deployed/Retracting)
         bool connected;                 // Connecte via BLE
         uint32_t last_update_time;      // Timestamp de la derniere mise a jour
+        float position_percent;         // Position du projecteur en pourcentage (0.0 - 100.0)
     } videoprojecteur;
-    
+
     // ═══════════════════════════════════════════════════════════
     // SLAVE PCB - Etat de la carte esclave
     // ═══════════════════════════════════════════════════════════

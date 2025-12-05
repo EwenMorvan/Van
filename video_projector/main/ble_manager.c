@@ -152,6 +152,14 @@ static void ble_on_sync(void)
     
     ESP_LOGI(TAG, "BLE host synchronisé");
     
+    // Définit la MTU préférée à 247 octets (max BLE)
+    rc = ble_att_set_preferred_mtu(247);
+    if (rc != 0) {
+        ESP_LOGE(TAG, "Erreur définition MTU préférée: %d", rc);
+    } else {
+        ESP_LOGI(TAG, "MTU préférée définie à 247 octets");
+    }
+    
     // Configure le nom du device AVANT d'ajouter les services
     rc = ble_svc_gap_device_name_set(g_device_name);
     if (rc != 0) {
@@ -321,6 +329,35 @@ int ble_manager_notify_status(bool is_deployed)
     ESP_LOGI(TAG, "Notification statut envoyée (déployé: %s)", 
              is_deployed ? "OUI" : "NON");
     
+    return 0;
+}
+
+int ble_manager_send_json(const char *json_string)
+{
+    struct os_mbuf *om;
+    int rc;
+    
+    if (!g_is_connected || json_string == NULL) {
+        return -1;
+    }
+    
+    size_t len = strlen(json_string);
+    
+    // Crée un buffer pour la notification
+    om = ble_hs_mbuf_from_flat(json_string, len);
+    if (om == NULL) {
+        ESP_LOGE(TAG, "Erreur création buffer JSON");
+        return -1;
+    }
+    
+    // Envoie la notification
+    rc = ble_gatts_notify_custom(g_conn_handle, g_status_char_handle, om);
+    if (rc != 0) {
+        ESP_LOGE(TAG, "Erreur envoi JSON: %d", rc);
+        return -1;
+    }
+    
+    ESP_LOGD(TAG, "JSON envoyé: %s", json_string);
     return 0;
 }
 

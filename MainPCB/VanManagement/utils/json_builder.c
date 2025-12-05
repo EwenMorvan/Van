@@ -127,6 +127,7 @@ int json_build_van_state(const van_state_t* state, char* buffer, size_t buffer_s
     cJSON_AddNumberToObject(sensors, "exterior_temperature", state->sensors.exterior_temperature);
     cJSON_AddNumberToObject(sensors, "humidity", state->sensors.humidity);
     cJSON_AddNumberToObject(sensors, "co2_level", state->sensors.co2_level);
+    cJSON_AddNumberToObject(sensors, "light", state->sensors.light);
     cJSON_AddBoolToObject(sensors, "door_open", state->sensors.door_open);
     cJSON_AddItemToObject(root, "sensors", sensors);
     
@@ -293,6 +294,7 @@ int json_build_van_state(const van_state_t* state, char* buffer, size_t buffer_s
     cJSON_AddNumberToObject(videoprojecteur, "state", state->videoprojecteur.state);
     cJSON_AddBoolToObject(videoprojecteur, "connected", state->videoprojecteur.connected);
     cJSON_AddNumberToObject(videoprojecteur, "last_update_time", state->videoprojecteur.last_update_time);
+    cJSON_AddNumberToObject(videoprojecteur, "position_percent", state->videoprojecteur.position_percent);
     cJSON_AddItemToObject(root, "videoprojecteur", videoprojecteur);
 
     // Add the end identifier

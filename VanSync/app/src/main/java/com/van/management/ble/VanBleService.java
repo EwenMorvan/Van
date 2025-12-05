@@ -458,6 +458,7 @@ public class VanBleService extends Service {
                 // Vérifier si le JSON est complet
                 if (bufferContent.startsWith("{\"start_van_state\":\"\"") && bufferContent.endsWith("\"end_van_state\":\"\"}\n")) {
                     Log.d(TAG, "✅ JSON complet reçu (" + bufferContent.length() + " chars)");
+                    //Log.d(TAG, "JSON reçu : " + bufferContent.toString());
 
                     if (callback != null) {
                         mainHandler.post(() -> callback.onDataReceived(bufferContent));

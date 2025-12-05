@@ -15,7 +15,13 @@ typedef enum {
     BLE_CMD_JOG_UP_01,        // 6: +0.1 tour
     BLE_CMD_JOG_DOWN_01,      // 7: -0.1 tour
     BLE_CMD_JOG_UP_001,       // 8: +0.01 tour
-    BLE_CMD_JOG_DOWN_001      // 9: -0.01 tour
+    BLE_CMD_JOG_DOWN_001,     // 9: -0.01 tour
+    // Commandes sans limites (pour dépasser 0-100%)
+    BLE_CMD_JOG_UP_UNLIMITED, // 10: +1.0 tour sans limite
+    BLE_CMD_JOG_DOWN_UNLIMITED, // 11: -1.0 tour sans limite
+    // Commandes de calibration (force position sans bouger)
+    BLE_CMD_CALIB_UP,         // 12: Force position à 100%
+    BLE_CMD_CALIB_DOWN        // 13: Force position à 0%
 } ble_command_t;
 
 typedef void (*ble_command_callback_t)(ble_command_t cmd);
@@ -46,6 +52,13 @@ int ble_manager_stop_advertising(void);
  * @return 0 si succès, -1 si erreur
  */
 int ble_manager_notify_status(bool is_deployed);
+
+/**
+ * @brief Envoie des données JSON aux clients connectés
+ * @param json_string Chaîne JSON à envoyer
+ * @return 0 si succès, -1 si erreur
+ */
+int ble_manager_send_json(const char *json_string);
 
 /**
  * @brief Vérifie si un client BLE est connecté

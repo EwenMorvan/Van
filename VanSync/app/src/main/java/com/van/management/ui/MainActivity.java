@@ -712,6 +712,7 @@ public class MainActivity extends AppCompatActivity implements VanBleService.Van
             addInfoRow(vanStateContainer, "Exterior Temp:", String.format("%.1f°C", lastVanState.sensors.exterior_temperature), ContextCompat.getColor(this, R.color.white));
             addInfoRow(vanStateContainer, "Humidity:", String.format("%.1f%%", lastVanState.sensors.humidity), ContextCompat.getColor(this, R.color.white));
             addInfoRow(vanStateContainer, "CO2:", String.format("%d ppm", lastVanState.sensors.co2_level), ContextCompat.getColor(this, R.color.white));
+            addInfoRow(vanStateContainer, "Light Level:", String.format("%d raw adc", lastVanState.sensors.light), ContextCompat.getColor(this, R.color.white));
             addInfoRow(vanStateContainer, "Door:", lastVanState.sensors.door_open ? "Open" : "Closed", lastVanState.sensors.door_open ? ContextCompat.getColor(this, R.color.warning) : ContextCompat.getColor(this, R.color.white));
         }
         

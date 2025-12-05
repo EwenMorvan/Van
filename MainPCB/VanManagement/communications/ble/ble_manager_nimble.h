@@ -259,6 +259,19 @@ esp_err_t ble_write_to_external_device(const uint8_t mac_address[6],
                                       const uint8_t* data, 
                                       size_t len);
 
+/**
+ * @brief Request video projector status (reads characteristic 0x2A19)
+ * @param mac_address 6-byte MAC address of the projector
+ */
+esp_err_t ble_request_projector_status(const uint8_t mac_address[6]);
+
+/**
+ * @brief Send a projector command (writes to characteristic 0x2A58)
+ * @param mac_address 6-byte MAC address of the projector
+ * @param cmd Projector command (see `projector_command_t` in `protocol.h`)
+ */
+esp_err_t ble_send_projector_command(const uint8_t mac_address[6], uint8_t cmd);
+
 // ============================================================================
 // DEBUG & MONITORING
 // ============================================================================

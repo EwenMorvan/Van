@@ -11,7 +11,7 @@
     android:layout_marginEnd="@dimen/card_side_margin"
     android:background="@drawable/card_container">
 
-    <!-- Header avec titre centré -->
+    <!-- Header avec titre centré et bouton settings -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header_layout"
         android:layout_width="0dp"
@@ -21,19 +21,61 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:background="@drawable/card_header">
 
+        <!-- BLE Status Indicator (Left) -->
+        <ImageView
+            android:id="@+id/header_bt_icon_bg"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@drawable/round_filled"
+            android:layout_margin="@dimen/margin_large"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/disconnected" />
+
+        <ImageView
+            android:id="@+id/header_bt_icon"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/margin_small"
+            android:src="@drawable/ic_bluetooth"
+            app:layout_constraintBottom_toBottomOf="@+id/header_bt_icon_bg"
+            app:layout_constraintEnd_toEndOf="@+id/header_bt_icon_bg"
+            app:layout_constraintStart_toStartOf="@+id/header_bt_icon_bg"
+            app:layout_constraintTop_toTopOf="@+id/header_bt_icon_bg" />
+        
+
         <TextView
             android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_medium"
             android:gravity="center"
+            android:padding="@dimen/padding_medium"
             android:text="🎬 VanCinema"
-            android:textSize="@dimen/text_size_xlarge"
             android:textColor="@color/white"
+            android:textSize="@dimen/text_size_xlarge"
             android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/btn_advanced_settings"
+            app:layout_constraintStart_toStartOf="@+id/header_bt_icon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Advanced Settings Button -->
+        <ImageButton
+            android:id="@+id/btn_advanced_settings"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_settings"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="centerInside"
+            android:contentDescription="Advanced settings"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:padding="@dimen/padding_medium" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:padding="@dimen/padding_small"
+            app:tint="@color/white" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -47,13 +89,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:padding="@dimen/padding_xlarge">
 
-        <!-- Status Icon and Text -->
+        <!-- Projector Icon and Text -->
         <ImageView
             android:id="@+id/cinema_icon"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@drawable/ic_videoproj"
-            app:tint="@color/disconnected"
+            app:tint="@color/gray"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -62,9 +104,9 @@
             android:id="@+id/cinema_status_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CLOSED"
+            android:text="UNKNOWN"
             android:textSize="@dimen/text_size_xlarge"
-            android:textColor="@color/disconnected"
+            android:textColor="@color/gray"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/cinema_icon"
             app:layout_constraintStart_toStartOf="parent"
@@ -76,13 +118,28 @@
             android:id="@+id/cinema_position_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Position: 0mm"
+            android:text="Position: 0%"
             android:textSize="@dimen/text_size_large"
             android:textColor="@color/white"
+            android:visibility="invisible"
             app:layout_constraintTop_toBottomOf="@id/cinema_status_text"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="@dimen/margin_large" />
+        <TextView
+            android:id="@+id/cinema_disconnected_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⚠️ Videoprojetor is not connected via Bluetooth"
+            android:textSize="@dimen/text_size_medium"
+            android:textColor="@color/error"
+            android:textStyle="bold"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/cinema_status_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="@dimen/margin_large" />
+
 
         <!-- Deploy/Retract Main Button -->
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -97,6 +154,8 @@
             android:background="@drawable/card_container"
             android:clickable="true"
             android:focusable="true"
+            android:enabled="false"
+            android:alpha="0.5"
             android:padding="@dimen/padding_large">
 
             <TextView
@@ -136,6 +195,8 @@
                 android:background="@drawable/card_container"
                 android:clickable="true"
                 android:focusable="true"
+                android:enabled="false"
+                android:alpha="0.5"
                 android:padding="@dimen/padding_medium">
 
                 <TextView
@@ -164,12 +225,14 @@
                 android:background="@drawable/card_container"
                 android:clickable="true"
                 android:focusable="true"
+                android:enabled="false"
+                android:alpha="0.5"
                 android:padding="@dimen/padding_medium">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⬆ 0.1mm"
+                    android:text="⬇ 1mm"
                     android:textSize="@dimen/text_size_medium"
                     android:textColor="@color/white"
                     android:textStyle="bold"
@@ -193,12 +256,14 @@
                 android:background="@drawable/card_container"
                 android:clickable="true"
                 android:focusable="true"
+                android:enabled="false"
+                android:alpha="0.5"
                 android:padding="@dimen/padding_medium">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⬇ 0.1mm"
+                    android:text="⬆ 0.1mm"
                     android:textSize="@dimen/text_size_medium"
                     android:textColor="@color/white"
                     android:textStyle="bold"
@@ -222,12 +287,14 @@
                 android:background="@drawable/card_container"
                 android:clickable="true"
                 android:focusable="true"
+                android:enabled="false"
+                android:alpha="0.5"
                 android:padding="@dimen/padding_medium">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⬇ 1mm"
+                    android:text="⬇ 0.1mm"
                     android:textSize="@dimen/text_size_medium"
                     android:textColor="@color/white"
                     android:textStyle="bold"

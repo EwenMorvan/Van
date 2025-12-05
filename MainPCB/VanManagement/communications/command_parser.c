@@ -329,7 +329,7 @@ bool validate_parsed_command(const van_command_t* cmd) {
         
         case COMMAND_TYPE_MULTIMEDIA:
             return (cmd->command.videoprojecteur_cmd.cmd >= PROJECTOR_CMD_DEPLOY && 
-                    cmd->command.videoprojecteur_cmd.cmd <= PROJECTOR_CMD_JOG_DOWN_001);
+                cmd->command.videoprojecteur_cmd.cmd <= PROJECTOR_CMD_CALIBRATE_DOWN);
         
         default:
             return false;
@@ -464,6 +464,10 @@ const char* projector_command_to_string(projector_command_t cmd) {
         case PROJECTOR_CMD_JOG_DOWN_1: return "JOG_DOWN_1";
         case PROJECTOR_CMD_JOG_DOWN_01: return "JOG_DOWN_0.1";
         case PROJECTOR_CMD_JOG_DOWN_001: return "JOG_DOWN_0.01";
+        case PROJECTOR_CMD_JOG_UP_1_FORCED: return "JOG_UP_1_FORCED";
+        case PROJECTOR_CMD_JOG_DOWN_1_FORCED: return "JOG_DOWN_1_FORCED";
+        case PROJECTOR_CMD_CALIBRATE_UP: return "CALIBRATE_UP";
+        case PROJECTOR_CMD_CALIBRATE_DOWN: return "CALIBRATE_DOWN";
         default: return "UNKNOWN";
     }
 }

@@ -11,16 +11,20 @@ public class ProjectorCommand {
     
     // Command types (correspond à projector_command_t)
     public enum CommandType {
-        DEPLOY(0),                  // Deploie completement (0x00)
-        RETRACT(1),                 // Retracte completement (0x01)
-        STOP(2),                    // Arrete le moteur (0x02)
-        GET_STATUS(3),              // Demande le statut (0x03)
-        JOG_UP_1(4),                // Avance de 1.0 tour (0x04)
-        JOG_UP_01(5),               // Avance de 0.1 tour (0x05)
-        JOG_UP_001(6),              // Avance de 0.01 tour (0x06)
-        JOG_DOWN_1(7),              // Recule de 1.0 tour (0x07)
-        JOG_DOWN_01(8),             // Recule de 0.1 tour (0x08)
-        JOG_DOWN_001(9);            // Recule de 0.01 tour (0x09)
+        DEPLOY(0),                      // Deploie completement (0x00)
+        RETRACT(1),                     // Retracte completement (0x01)
+        STOP(2),                        // Arrete le moteur (0x02)
+        GET_STATUS(3),                  // Demande le statut (0x03)
+        JOG_UP_1(4),                    // Avance de 1.0 tour (0x04)
+        JOG_UP_01(5),                   // Avance de 0.1 tour (0x05)
+        JOG_UP_001(6),                  // Avance de 0.01 tour (0x06)
+        JOG_DOWN_1(7),                  // Recule de 1.0 tour (0x07)
+        JOG_DOWN_01(8),                 // Recule de 0.1 tour (0x08)
+        JOG_DOWN_001(9),                // Recule de 0.01 tour (0x09)
+        JOG_UP_1_FORCED(10),            // Avance de 1.0 tour (force) (0x0A)
+        JOG_DOWN_1_FORCED(11),          // Recule de 1.0 tour (force) (0x0B)
+        CALIBRATE_UP(12),               // Calibrage vers le haut (0x0C)
+        CALIBRATE_DOWN(13);             // Calibrage vers le bas (0x0D)
         
         private final int value;
         CommandType(int value) { this.value = value; }
@@ -72,6 +76,22 @@ public class ProjectorCommand {
     
     public static ProjectorCommand jogDown001() {
         return new ProjectorCommand(CommandType.JOG_DOWN_001);
+    }
+    
+    public static ProjectorCommand jogUp1Forced() {
+        return new ProjectorCommand(CommandType.JOG_UP_1_FORCED);
+    }
+    
+    public static ProjectorCommand jogDown1Forced() {
+        return new ProjectorCommand(CommandType.JOG_DOWN_1_FORCED);
+    }
+    
+    public static ProjectorCommand calibrateUp() {
+        return new ProjectorCommand(CommandType.CALIBRATE_UP);
+    }
+    
+    public static ProjectorCommand calibrateDown() {
+        return new ProjectorCommand(CommandType.CALIBRATE_DOWN);
     }
     
     /**

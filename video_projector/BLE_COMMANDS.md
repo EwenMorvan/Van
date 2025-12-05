@@ -27,6 +27,9 @@ Envoyer un **octet unique** à la caractéristique de contrôle `0x2A58` :
 
 ### Commandes de réglage fin (JOG)
 
+
+
+
 | Commande | Valeur (décimal) | Valeur (hex) | Description |
 |----------|------------------|--------------|-------------|
 | `JOG_UP_1` | 4 | 0x04 | Avance de **1.0 tour** de tige (vers le haut) |
@@ -35,5 +38,17 @@ Envoyer un **octet unique** à la caractéristique de contrôle `0x2A58` :
 | `JOG_DOWN_1` | 7 | 0x07 | Recule de **1.0 tour** de tige (vers le bas) |
 | `JOG_DOWN_01` | 8 | 0x08 | Recule de **0.1 tour** de tige (vers le bas) |
 | `JOG_DOWN_001` | 9 | 0x09 | Recule de **0.01 tour** de tige (vers le bas) |
+| `JOG_UP_UNLIMITED` | 10 | 0x0A | Avance de **1.0 tour** de tige sans limite (dépasse 100%) |
+| `JOG_DOWN_UNLIMITED` | 11 | 0x0B | Recule de **1.0 tour** de tige sans limite (dépasse 0%) |
+
+### Commandes de calibration
+
+| Commande | Valeur (décimal) | Valeur (hex) | Description |
+|----------|------------------|--------------|-------------|
+| `CALIB_UP` | 12 | 0x0C | Force la position à **100%** sans bouger le moteur |
+| `CALIB_DOWN` | 13 | 0x0D | Force la position à **0%** sans bouger le moteur |
+
+
+
 
 ---

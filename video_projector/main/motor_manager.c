@@ -5,19 +5,32 @@
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "esp_attr.h"
+#include "nvs_flash.h"
+#include "nvs.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <math.h>
 
 static const char *TAG = "MOTOR_MANAGER";
+static const char *NVS_NAMESPACE = "motor_state";
+static const char *NVS_KEY_POSITION = "position";
+static const char *NVS_KEY_STATE = "state";
 
 static motor_config_t g_motor_config;
 static volatile int32_t g_encoder_count = 0;
 static bool g_is_moving = false;
+static motor_state_callback_t g_state_callback = NULL;
 
 // Variables pour le suivi des mouvements
 static int32_t g_move_target = 0;
 static motor_direction_t g_move_direction = MOTOR_DIR_UP;
+static bool g_is_jog_movement = false;  // true si mouvement JOG, false si deploy/retract complet
+static int32_t g_initial_pos = 0;  // Position initiale avant mouvement
+static int64_t g_movement_start_time = 0;  // Temps de début du mouvement pour timeout
+
+// Prototypes des fonctions internes
+void notify_state_change(motor_state_t new_state);
+static void save_position_to_nvs(void);
 
 // PWM et accélération (2 phases: ACCEL + CRUISE)
 static volatile uint8_t g_pwm_duty = 0;           // 0-255 (duty cycle)
@@ -137,7 +150,7 @@ static int motor_setup_gpio(void)
         .pin_bit_mask = (1ULL << g_motor_config.pin_sleep),
         .mode = GPIO_MODE_OUTPUT,
         .pull_up_en = GPIO_PULLUP_DISABLE,
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_ENABLE,   // <-- Activer pull-down pour verrouiller à 0
         .intr_type = GPIO_INTR_DISABLE
     };
     ret = gpio_config(&io_conf);
@@ -145,14 +158,22 @@ static int motor_setup_gpio(void)
         ESP_LOGE(TAG, "Erreur config GPIO SLEEP");
         return -1;
     }
-    
+    // Forcer immédiatement l'état bas (sécurité dès la config)
+    gpio_set_level(g_motor_config.pin_sleep, 0);
+
     // Configuration GPIO pour DIR1 (D6) et DIR2 (D7)
     io_conf.pin_bit_mask = (1ULL << g_motor_config.pin_dir1) | (1ULL << g_motor_config.pin_dir2);
+    io_conf.mode = GPIO_MODE_OUTPUT;
+    io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+    io_conf.pull_down_en = GPIO_PULLDOWN_ENABLE; // <-- Activer pull-down pour verrouiller à 0
     ret = gpio_config(&io_conf);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Erreur config GPIO DIR");
         return -1;
     }
+    // Forcer immédiatement les sorties DIR à 0 (sécurité)
+    gpio_set_level(g_motor_config.pin_dir1, 0);
+    gpio_set_level(g_motor_config.pin_dir2, 0);
     
     // Configuration GPIO pour encodeur
     // motor_setup_encoder_isr() va les configurer avec les interruptions
@@ -323,7 +344,7 @@ int motor_manager_init(const motor_config_t *config)
     g_motor_config = *config;
     g_encoder_count = 0;
     g_motor_config.current_position = 0;
-    g_motor_config.is_deployed = false;
+    g_motor_config.state = MOTOR_STATE_RETRACTED;
     
     // Configure les GPIOs
     if (motor_setup_gpio() != 0) {
@@ -341,6 +362,45 @@ int motor_manager_init(const motor_config_t *config)
     gpio_set_level(g_motor_config.pin_sleep, 0);
     gpio_set_level(g_motor_config.pin_dir1, 0);
     gpio_set_level(g_motor_config.pin_dir2, 0);
+    
+    // Restaure la position sauvegardée depuis NVS
+    ESP_LOGI(TAG, "🔍 Tentative de restauration depuis NVS...");
+    nvs_handle_t nvs_handle;
+    esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READONLY, &nvs_handle);
+    if (err == ESP_OK) {
+        int32_t saved_position = 0;
+        uint8_t saved_state = MOTOR_STATE_RETRACTED;
+        bool position_restored = false;
+        bool state_restored = false;
+        
+        err = nvs_get_i32(nvs_handle, NVS_KEY_POSITION, &saved_position);
+        if (err == ESP_OK) {
+            g_encoder_count = saved_position;
+            g_motor_config.current_position = saved_position;
+            position_restored = true;
+            ESP_LOGI(TAG, "📥 Position restaurée: %ld impulsions", saved_position);
+        } else {
+            ESP_LOGW(TAG, "⚠️ Pas de position sauvegardée: %s", esp_err_to_name(err));
+        }
+        
+        err = nvs_get_u8(nvs_handle, NVS_KEY_STATE, &saved_state);
+        if (err == ESP_OK) {
+            g_motor_config.state = (motor_state_t)saved_state;
+            state_restored = true;
+            ESP_LOGI(TAG, "📥 État restauré: %d", saved_state);
+        } else {
+            ESP_LOGW(TAG, "⚠️ Pas d'état sauvegardé: %s", esp_err_to_name(err));
+        }
+        
+        if (position_restored && state_restored) {
+            float percent = motor_manager_get_position_percent();
+            ESP_LOGI(TAG, "✅ Restauration complète: %.2f%%, état=%d", percent, saved_state);
+        }
+        
+        nvs_close(nvs_handle);
+    } else {
+        ESP_LOGI(TAG, "ℹ️ Aucune position sauvegardée (première utilisation): %s", esp_err_to_name(err));
+    }
     
     // Lance la tâche de rampe PWM
     xTaskCreate(motor_pwm_ramp_task, "motor_pwm_ramp", 2048, NULL, 9, NULL);
@@ -364,6 +424,10 @@ int motor_manager_turn(float n_turns_tige, motor_direction_t direction)
     // Gear ratio corrigé: 1:150 selon datasheet moteur
     int32_t impulses = (int32_t)(n_turns_tige * g_motor_config.gear_ratio * 7);
     int32_t target_pulses = impulses * 4;  // ×4 quadrature
+    
+    // Sauvegarde la position initiale
+    g_initial_pos = g_encoder_count;
+    g_movement_start_time = esp_timer_get_time();  // Temps de début pour timeout
     
     // Reset des compteurs encodeur
     portENTER_CRITICAL(&g_encoder_spinlock);
@@ -391,6 +455,10 @@ int motor_manager_turn(float n_turns_tige, motor_direction_t direction)
  * 
  * NOTE: La décélération progressive est gérée par motor_pwm_ramp_task()
  * Cette fonction vérifie juste si la cible est complètement atteinte
+ * 
+ * Gestion intelligente des états:
+ * - Si mouvement JOG: vérifie si on traverse 50% pour changer DEPLOYED↔RETRACTED
+ * - Si deploy/retract complet: change vers DEPLOYED ou RETRACTED
  */
 void motor_manager_check_target(void)
 {
@@ -398,10 +466,25 @@ void motor_manager_check_target(void)
         return;
     }
     
+    int64_t current_time = esp_timer_get_time();
+    
+    // Vérification timeout: si pas d'impulsions depuis >1s (moteur bloqué)
+    if ((current_time - g_movement_start_time) > (500 * 1000) &&  // Au moins 100ms depuis début
+        (current_time - g_last_pulse_time) > (0.5 * 1000 * 1000)) {  // Pas d'impulsions depuis 0.5s
+        ESP_LOGW(TAG, "⏰ Timeout moteur: pas d'impulsions depuis 0.5s, blocage détecté, arrêt forcé");
+        motor_manager_stop();
+        motor_manager_set_state(MOTOR_STATE_STOPPED);
+        g_is_moving = false;
+        g_move_target = 0;
+        g_motor_phase = PHASE_ACCEL;
+        g_is_jog_movement = false;  // Reset
+        return;
+    }
+    
     int32_t current_pos = motor_manager_get_position();
     
-    // Distance parcourue (valeur absolue)
-    int32_t distance_traveled = (current_pos >= 0) ? current_pos : -current_pos;
+    // Distance parcourue basée sur le delta accumulé (g_encoder_count est le delta depuis début mouvement)
+    int32_t distance_traveled = abs(g_encoder_count);
     
     // Cible atteinte si distance parcourue >= target
     // Pas grave s'il y a un léger dépassement
@@ -412,42 +495,114 @@ void motor_manager_check_target(void)
         g_is_moving = false;
         g_move_target = 0;
         g_motor_phase = PHASE_ACCEL;
+        
+        // Gestion intelligente de l'état final
+        motor_state_t current_state = g_motor_config.state;
+        float final_percent = motor_manager_get_position_percent();
+        motor_state_t new_state = current_state;
+        
+        if (g_is_jog_movement) {
+            // Mouvement JOG: change d'état seulement si on traverse 50%
+            if (current_state == MOTOR_STATE_DEPLOYING || current_state == MOTOR_STATE_DEPLOYED) {
+                if (final_percent < 50.0f) {
+                    new_state = MOTOR_STATE_RETRACTED;
+                    ESP_LOGI(TAG, "🔄 JOG: passage sous 50%% → RETRACTED");
+                } else {
+                    new_state = MOTOR_STATE_DEPLOYED;
+                }
+            } else if (current_state == MOTOR_STATE_RETRACTING || current_state == MOTOR_STATE_RETRACTED) {
+                if (final_percent >= 50.0f) {
+                    new_state = MOTOR_STATE_DEPLOYED;
+                    ESP_LOGI(TAG, "🔄 JOG: passage au-dessus 50%% → DEPLOYED");
+                } else {
+                    new_state = MOTOR_STATE_RETRACTED;
+                }
+            } else if (current_state == MOTOR_STATE_STOPPED) {
+                // Depuis STOPPED, décider basé sur la position finale
+                if (final_percent >= 50.0f) {
+                    new_state = MOTOR_STATE_DEPLOYED;
+                    ESP_LOGI(TAG, "🔄 JOG depuis STOPPED: position >=50%% → DEPLOYED");
+                } else {
+                    new_state = MOTOR_STATE_RETRACTED;
+                    ESP_LOGI(TAG, "🔄 JOG depuis STOPPED: position <50%% → RETRACTED");
+                }
+            }
+            g_is_jog_movement = false;  // Reset du flag
+        } else {
+            // Mouvement complet deploy/retract: change vers l'état final
+            if (current_state == MOTOR_STATE_DEPLOYING) {
+                new_state = MOTOR_STATE_DEPLOYED;
+                ESP_LOGI(TAG, "✅ Déploiement terminé → DEPLOYED");
+            } else if (current_state == MOTOR_STATE_RETRACTING) {
+                new_state = MOTOR_STATE_RETRACTED;
+                ESP_LOGI(TAG, "✅ Rétraction terminée → RETRACTED");
+            }
+        }
+        
+        // Notifie le changement d'état si nécessaire
+        if (new_state != current_state) {
+            notify_state_change(new_state);
+        }
     }
 }
 
 int motor_manager_deploy_video_proj(void)
 {
-    if (g_motor_config.is_deployed) {
-        ESP_LOGW(TAG, "Vidéoprojecteur déjà déployé");
-        return 0;
-    }
-    
-    if (motor_manager_turn(g_motor_config.turns_per_complete_travel, MOTOR_DIR_UP) != 0) {
+    if (g_motor_config.state != MOTOR_STATE_RETRACTED && g_motor_config.state != MOTOR_STATE_STOPPED) {
+        ESP_LOGW(TAG, "Déploiement impossible: état actuel %d (doit être RETRACTED ou STOPPED)", g_motor_config.state);
         return -1;
     }
     
-    g_motor_config.is_deployed = true;
-    g_motor_config.current_position = g_motor_config.turns_per_complete_travel;
+    // Calculer les tours restants pour atteindre 100%
+    float current_percent = motor_manager_get_position_percent();
+    float remaining_percent = 100.0f - current_percent;
+    float turns_to_do = g_motor_config.turns_per_complete_travel * (remaining_percent / 100.0f);
     
-    ESP_LOGI(TAG, "Déploiement du vidéoprojecteur lancé");
+    if (turns_to_do <= 0.0f) {
+        // Déjà à 100%, forcer l'état
+        notify_state_change(MOTOR_STATE_DEPLOYED);
+        return 0;
+    }
+    
+    notify_state_change(MOTOR_STATE_DEPLOYING);
+    ESP_LOGI(TAG, "Déploiement du vidéoprojecteur lancé: %.2f tours restants (%.1f%%)", turns_to_do, remaining_percent);
+    
+    g_is_jog_movement = false;  // Mouvement complet, pas un JOG
+    
+    if (motor_manager_turn(turns_to_do, MOTOR_DIR_UP) != 0) {
+        return -1;
+    }
+    
     return 0;
 }
 
 int motor_manager_retract_video_proj(void)
 {
-    if (!g_motor_config.is_deployed) {
-        ESP_LOGW(TAG, "Vidéoprojecteur déjà rétracté");
-        return 0;
-    }
-    
-    if (motor_manager_turn(g_motor_config.turns_per_complete_travel, MOTOR_DIR_DOWN) != 0) {
+    if (g_motor_config.state != MOTOR_STATE_DEPLOYED && g_motor_config.state != MOTOR_STATE_STOPPED) {
+        ESP_LOGW(TAG, "Rétraction impossible: état actuel %d (doit être DEPLOYED ou STOPPED)", g_motor_config.state);
         return -1;
     }
     
-    g_motor_config.is_deployed = false;
-    g_motor_config.current_position = 0;
+    // Calculer les tours restants pour atteindre 0%
+    float current_percent = motor_manager_get_position_percent();
+    float remaining_percent = current_percent;
+    float turns_to_do = g_motor_config.turns_per_complete_travel * (remaining_percent / 100.0f);
     
-    ESP_LOGI(TAG, "Rétraction du vidéoprojecteur lancée");
+    if (turns_to_do <= 0.0f) {
+        // Déjà à 0%, forcer l'état
+        notify_state_change(MOTOR_STATE_RETRACTED);
+        return 0;
+    }
+    
+    notify_state_change(MOTOR_STATE_RETRACTING);
+    ESP_LOGI(TAG, "Rétraction du vidéoprojecteur lancée: %.2f tours restants (%.1f%%)", turns_to_do, remaining_percent);
+    
+    g_is_jog_movement = false;  // Mouvement complet, pas un JOG
+    
+    if (motor_manager_turn(turns_to_do, MOTOR_DIR_DOWN) != 0) {
+        return -1;
+    }
+    
     return 0;
 }
 
@@ -462,10 +617,21 @@ void motor_manager_stop(void)
     // Met le moteur en sleep
     gpio_set_level(g_motor_config.pin_sleep, 0);
     
-    g_is_moving = false;
     g_motor_config.current_position = g_encoder_count;
     
-    ESP_LOGI(TAG, "Moteur arrêté, position: %ld impulsions", g_motor_config.current_position);
+    // Ajuste g_encoder_count pour position absolue seulement si mouvement en cours
+    if (g_is_moving) {
+        g_encoder_count = g_initial_pos + g_encoder_count;
+        g_motor_config.current_position = g_encoder_count;
+    }
+    
+    g_is_moving = false;
+    
+    // Sauvegarde la position en mémoire non-volatile
+    save_position_to_nvs();
+    
+    ESP_LOGI(TAG, "Moteur arrêté, position: %ld impulsions (%.2f%%)", 
+             g_motor_config.current_position, motor_manager_get_position_percent());
 }
 
 /**
@@ -492,19 +658,61 @@ void motor_manager_set_pwm(int16_t pwm)
     }
 }
 
-bool motor_manager_is_deployed(void)
-{
-    return g_motor_config.is_deployed;
-}
-
 int32_t motor_manager_get_position(void)
 {
-    return g_encoder_count;
+    if (g_is_moving) {
+        return g_initial_pos + g_encoder_count;
+    } else {
+        return g_encoder_count;
+    }
+}
+
+/**
+ * @brief Sauvegarde la position et l'état dans la NVS (mémoire non-volatile)
+ */
+static void save_position_to_nvs(void)
+{
+    nvs_handle_t nvs_handle;
+    esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs_handle);
+    
+    if (err == ESP_OK) {
+        // Sauvegarde position
+        err = nvs_set_i32(nvs_handle, NVS_KEY_POSITION, g_encoder_count);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "Erreur sauvegarde position: %s", esp_err_to_name(err));
+        }
+        
+        // Sauvegarde état
+        err = nvs_set_u8(nvs_handle, NVS_KEY_STATE, (uint8_t)g_motor_config.state);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "Erreur sauvegarde état: %s", esp_err_to_name(err));
+        }
+        
+        // Commit des changements
+        err = nvs_commit(nvs_handle);
+        if (err == ESP_OK) {
+            float percent = motor_manager_get_position_percent();
+            ESP_LOGI(TAG, "💾 Position sauvegardée: %ld impulsions (%.2f%%), état: %d",
+                     g_encoder_count, percent, g_motor_config.state);
+        } else {
+            ESP_LOGE(TAG, "❌ Erreur commit NVS: %s", esp_err_to_name(err));
+        }
+        
+        nvs_close(nvs_handle);
+    } else {
+        ESP_LOGE(TAG, "Erreur ouverture NVS: %s", esp_err_to_name(err));
+    }
 }
 
 /**
  * @brief Fait un mouvement de réglage fin (jog)
  * Utilisé pour ajuster précisément la position du vidéoprojecteur
+ * 
+ * Logique intelligente:
+ * - Bouge le moteur dans les limites (0-100%)
+ * - Garde l'état actuel (DEPLOYED/RETRACTED) pendant le mouvement
+ * - À la fin du mouvement: change d'état si on traverse 50%
+ * - Si on est à la limite et on veut aller plus loin: recalibre sans bouger
  */
 int motor_manager_jog(float n_turns_tige, motor_direction_t direction)
 {
@@ -513,9 +721,192 @@ int motor_manager_jog(float n_turns_tige, motor_direction_t direction)
         return -1;
     }
     
-    ESP_LOGI(TAG, "JOG: %.2f tours tige, direction=%s",
-             n_turns_tige, direction == MOTOR_DIR_UP ? "UP" : "DOWN");
+    // Calcul de la position actuelle en %
+    float current_percent = motor_manager_get_position_percent();
+    motor_state_t current_state = g_motor_config.state;
     
-    // Utilise motor_manager_turn pour faire le mouvement
+    ESP_LOGI(TAG, "JOG: %.2f tours, direction=%s, position actuelle=%.2f%%, état=%d",
+             n_turns_tige, direction == MOTOR_DIR_UP ? "UP" : "DOWN", 
+             current_percent, current_state);
+    
+    // Calcul des limites
+    int32_t max_pulses = (int32_t)(g_motor_config.turns_per_complete_travel * 
+                                     g_motor_config.gear_ratio * 7 * 4);
+    int32_t jog_pulses = (int32_t)(n_turns_tige * g_motor_config.gear_ratio * 7 * 4);
+    int32_t current_pulses = g_encoder_count;
+    
+    // Vérifie les limites AVANT de bouger
+    if (direction == MOTOR_DIR_UP) {
+        if (current_pulses >= max_pulses) {
+            // Recalibration à 100% sans bouger
+            ESP_LOGI(TAG, "🔧 Recalibration à 100%% (déjà à la limite haute)");
+            portENTER_CRITICAL(&g_encoder_spinlock);
+            g_encoder_count = max_pulses;
+            portEXIT_CRITICAL(&g_encoder_spinlock);
+            g_motor_config.current_position = max_pulses;
+            save_position_to_nvs();
+            if (g_state_callback != NULL) {
+                g_state_callback(MOTOR_STATE_DEPLOYED, 100.0f);
+            }
+            return 0;
+        }
+        // Limite le mouvement pour ne pas dépasser 100%
+        if (current_pulses + jog_pulses > max_pulses) {
+            jog_pulses = max_pulses - current_pulses;
+            n_turns_tige = (float)jog_pulses / (g_motor_config.gear_ratio * 7 * 4);
+            ESP_LOGI(TAG, "⚠️ Mouvement limité à %.2f tours (atteindra 100%%)", n_turns_tige);
+        }
+    } else {
+        if (current_pulses <= 0) {
+            // Recalibration à 0% sans bouger
+            ESP_LOGI(TAG, "🔧 Recalibration à 0%% (déjà à la limite basse)");
+            portENTER_CRITICAL(&g_encoder_spinlock);
+            g_encoder_count = 0;
+            portEXIT_CRITICAL(&g_encoder_spinlock);
+            g_motor_config.current_position = 0;
+            save_position_to_nvs();
+            if (g_state_callback != NULL) {
+                g_state_callback(MOTOR_STATE_RETRACTED, 0.0f);
+            }
+            return 0;
+        }
+        // Limite le mouvement pour ne pas descendre sous 0%
+        if (current_pulses - jog_pulses < 0) {
+            jog_pulses = current_pulses;
+            n_turns_tige = (float)jog_pulses / (g_motor_config.gear_ratio * 7 * 4);
+            ESP_LOGI(TAG, "⚠️ Mouvement limité à %.2f tours (atteindra 0%%)", n_turns_tige);
+        }
+    }
+    
+    // Garde l'état actuel pendant le mouvement (pas DEPLOYING/RETRACTING)
+    // Le changement d'état se fera dans motor_manager_check_target() si on traverse 50%
+    
+    g_is_jog_movement = true;  // Indique que c'est un mouvement JOG
+    
+    // Lance le mouvement avec motor_manager_turn
     return motor_manager_turn(n_turns_tige, direction);
+}
+
+/**
+ * @brief Fait un mouvement JOG sans vérifier les limites
+ * Permet de dépasser 0-100% pour recalibrer manuellement
+ */
+int motor_manager_jog_unlimited(float n_turns_tige, motor_direction_t direction)
+{
+    if (g_is_moving) {
+        ESP_LOGW(TAG, "Moteur déjà en mouvement");
+        return -1;
+    }
+    
+    float current_percent = motor_manager_get_position_percent();
+    
+    ESP_LOGI(TAG, "🚀 JOG UNLIMITED: %.2f tours, direction=%s, position=%.2f%%",
+             n_turns_tige, direction == MOTOR_DIR_UP ? "UP" : "DOWN", current_percent);
+    
+    // Pas de vérification des limites - laisse le moteur aller au-delà
+    g_is_jog_movement = true;
+    
+    return motor_manager_turn(n_turns_tige, direction);
+}
+
+/**
+ * @brief Force la position à 100% sans bouger le moteur
+ * Utilisé pour calibrer la position haute
+ */
+void motor_manager_calibrate_up(void)
+{
+    int32_t max_pulses = (int32_t)(g_motor_config.turns_per_complete_travel * 
+                                     g_motor_config.gear_ratio * 7 * 4);
+    
+    portENTER_CRITICAL(&g_encoder_spinlock);
+    g_encoder_count = max_pulses;
+    portEXIT_CRITICAL(&g_encoder_spinlock);
+    g_motor_config.current_position = max_pulses;
+    
+    ESP_LOGI(TAG, "🎯 CALIBRATION UP: Position forcée à 100%% (%ld impulsions)", max_pulses);
+    
+    // Force l'état à DEPLOYED
+    g_motor_config.state = MOTOR_STATE_DEPLOYED;
+    save_position_to_nvs();
+    
+    // Notifie le callback
+    if (g_state_callback != NULL) {
+        g_state_callback(MOTOR_STATE_DEPLOYED, 100.0f);
+    }
+}
+
+/**
+ * @brief Force la position à 0% sans bouger le moteur
+ * Utilisé pour calibrer la position basse
+ */
+void motor_manager_calibrate_down(void)
+{
+    portENTER_CRITICAL(&g_encoder_spinlock);
+    g_encoder_count = 0;
+    portEXIT_CRITICAL(&g_encoder_spinlock);
+    g_motor_config.current_position = 0;
+    
+    ESP_LOGI(TAG, "🎯 CALIBRATION DOWN: Position forcée à 0%%");
+    
+    // Force l'état à RETRACTED
+    g_motor_config.state = MOTOR_STATE_RETRACTED;
+    save_position_to_nvs();
+    
+    // Notifie le callback
+    if (g_state_callback != NULL) {
+        g_state_callback(MOTOR_STATE_RETRACTED, 0.0f);
+    }
+}
+
+// ============================================================================
+// FONCTIONS D'ÉTAT ET POSITION
+// ============================================================================
+
+void motor_manager_set_state(motor_state_t state)
+{
+    notify_state_change(state);
+}
+
+void motor_manager_set_state_callback(motor_state_callback_t callback)
+{
+    g_state_callback = callback;
+}
+
+void notify_state_change(motor_state_t new_state)
+{
+    g_motor_config.state = new_state;
+    
+    // Sauvegarde l'état dans NVS à chaque changement
+    save_position_to_nvs();
+    
+    if (g_state_callback != NULL) {
+        float position_percent = motor_manager_get_position_percent();
+        g_state_callback(new_state, position_percent);
+    }
+}
+
+motor_state_t motor_manager_get_state(void)
+{
+    return g_motor_config.state;
+}
+
+bool motor_manager_is_deployed(void)
+{
+    return g_motor_config.state == MOTOR_STATE_DEPLOYED;
+}
+
+float motor_manager_get_position_percent(void)
+{
+    // Calcul de la position en %
+    // turns_per_complete_travel tours × gear_ratio × 7 PPR × 4 (quad) = impulsions max
+    int32_t max_pulses = (int32_t)(g_motor_config.turns_per_complete_travel * 
+                                     g_motor_config.gear_ratio * 7 * 4);
+    
+    if (max_pulses == 0) return 0.0f;
+    
+    int32_t current = motor_manager_get_position();
+    if (current < 0) current = 0;
+    if (current > max_pulses) current = max_pulses;
+    
+    return (float)current * 100.0f / (float)max_pulses;
 }
